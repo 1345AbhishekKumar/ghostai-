@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
+    "@clerk/nextjs": "^7.3.0",
+    "@clerk/ui": "^1.7.0",
     "baseline-browser-mapping": "^2.10.27",
     "caniuse-lite": "^1.0.30001791",
     "class-variance-authority": "^0.7.1",
