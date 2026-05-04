@@ -20,6 +20,20 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Prisma Commands
+
+This repo includes helper scripts for Prisma that run the CLI through Node 20.
+This avoids a known Node 22 + Prisma 7.8.0 module-loading error on Windows.
+
+```bash
+bun run prisma:init
+bun run prisma:generate
+bun run prisma:migrate:dev
+bun run prisma:studio
+```
+
+The `prisma:init` script writes Prisma client output to `./app/generated/prisma`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
