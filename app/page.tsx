@@ -1,11 +1,14 @@
-import { EditorLayout } from "@/components/editor/editor-layout"
+import { auth } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
 
-export default function Home() {
-  return (
-    <EditorLayout>
-      <section className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-muted-foreground">Canvas area</p>
-      </section>
-    </EditorLayout>
-  )
+import { clerkSignInPath } from "@/lib/clerk-routes"
+
+export default async function Home() {
+  const { isAuthenticated } = await auth()
+
+  if (isAuthenticated) {
+    redirect("/editor")
+  }
+
+  redirect(clerkSignInPath)
 }

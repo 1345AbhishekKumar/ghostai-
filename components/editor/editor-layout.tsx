@@ -4,12 +4,25 @@ import { type ReactNode, useState } from "react"
 
 import { EditorNavbar } from "@/components/editor/editor-navbar"
 import { ProjectSidebar } from "@/components/editor/project-sidebar"
+import { type EditorProject } from "@/types/editor-project"
 
 interface EditorLayoutProps {
   children: ReactNode
+  ownedProjects: EditorProject[]
+  sharedProjects: EditorProject[]
+  onCreateProject: () => void
+  onRenameProject: (projectId: string) => void
+  onDeleteProject: (projectId: string) => void
 }
 
-export function EditorLayout({ children }: EditorLayoutProps) {
+export function EditorLayout({
+  children,
+  ownedProjects,
+  sharedProjects,
+  onCreateProject,
+  onRenameProject,
+  onDeleteProject,
+}: EditorLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   return (
@@ -21,6 +34,11 @@ export function EditorLayout({ children }: EditorLayoutProps) {
       <ProjectSidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
+        onCreateProject={onCreateProject}
+        onRenameProject={onRenameProject}
+        onDeleteProject={onDeleteProject}
+        ownedProjects={ownedProjects}
+        sharedProjects={sharedProjects}
       />
       <main className="relative flex flex-1">{children}</main>
     </div>
