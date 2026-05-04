@@ -8,7 +8,7 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Current Goal
 
-- Feature Spec 07 complete. Prepare the next feature implementation unit.
+- Implement Feature Spec 09: Share dialog (owners can invite/remove collaborators, collaborators view-only).
 
 ## Completed
 
@@ -19,10 +19,11 @@ Update this file whenever the current phase, active feature , or implementation 
 - Feature Spec 05: Prisma project/collaborator models, Prisma singleton client with Accelerate/direct branching, and initial migration.
 - Feature Spec 06: Authenticated backend project API routes for list/create/rename/delete with owner-only mutation guards.
 - Feature Spec 07: Editor home sidebar and dialogs wired to real project data and project mutation APIs.
+- Feature Spec 08: Editor workspace shell with access control and layout placeholders.
 
 ## In Progress
 
-- No active implementation step.
+- Feature Spec 09: Share dialog — implementing
 
 ## Next Up
 
@@ -64,6 +65,7 @@ Update this file whenever the current phase, active feature , or implementation 
 - Added `app/api/projects/route.ts` (GET/POST) and `app/api/projects/[projectId]/route.ts` (PATCH/DELETE) with Clerk auth checks, owner authorization for rename/delete, default create name fallback, and explicit `401`/`403` responses.
 - Added `lib/project-data.ts` helper to fetch owned and shared projects server-side for `/editor` using Clerk auth + collaborator email matching.
 - Converted `app/editor/page.tsx` into a server component that fetches project data and passes it into `components/editor/editor-home-client.tsx`.
+- Implementing Feature Spec 09: Share dialog — added `components/editor/share-dialog.tsx`, UI in `components/editor/editor-workspace-client.tsx`, and new API route `app/api/projects/[projectId]/collaborators/route.ts` for listing/inviting/removing collaborators (owner-only for invite/remove).
 - Added `hooks/use-project-actions.ts` to manage create/rename/delete dialog state and call `POST /api/projects`, `PATCH /api/projects/[id]`, and `DELETE /api/projects/[id]`.
 - Wired create to slugify name + short suffix for room ID, create with aligned project ID/room ID, and navigate to `/editor/[projectId]` on success.
 - Wired rename to refresh on success and delete to redirect to `/editor` when removing the active workspace (otherwise refresh).
