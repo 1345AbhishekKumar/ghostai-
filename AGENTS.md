@@ -7,6 +7,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 use bun for installing packages and running commands for nextjs
 <!-- END:nextjs-agent-rules -->
 
+## Available Skills
+
+- frontend-design → Use for UI/UX, layout systems, premium hero sections, design systems
+
 ## Application Building Context
 
 Read the following files in order before implementing or making any architectural decision:
