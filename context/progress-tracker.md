@@ -8,7 +8,7 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Current Goal
 
-- Feature Spec 05 complete. Prepare the next feature implementation unit.
+- Feature Spec 07 complete. Prepare the next feature implementation unit.
 
 ## Completed
 
@@ -17,6 +17,8 @@ Update this file whenever the current phase, active feature , or implementation 
 - Feature Spec 03: Clerk provider integration, auth routes, protected-first proxy, root redirect flow, and editor user menu.
 - Feature Spec 04: Editor home CTA, project create/rename/delete dialogs, owner-only sidebar project actions, and mobile sidebar scrim close behavior.
 - Feature Spec 05: Prisma project/collaborator models, Prisma singleton client with Accelerate/direct branching, and initial migration.
+- Feature Spec 06: Authenticated backend project API routes for list/create/rename/delete with owner-only mutation guards.
+- Feature Spec 07: Editor home sidebar and dialogs wired to real project data and project mutation APIs.
 
 ## In Progress
 
@@ -24,11 +26,11 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Next Up
 
-- Begin authenticated project API routes and wire project persistence to editor actions.
+- Proceed to the next feature implementation unit.
 
 ## Open Questions
 
-- Next.js docs directory `node_modules/next/dist/docs` is missing in this repo. Confirm where the relevant guide lives.
+- None currently.
 
 ## Architecture Decisions
 
@@ -36,6 +38,8 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Session Notes
 
+- Updated `lib/prisma.ts` to normalize PostgreSQL connection URLs to explicit `sslmode=verify-full` by default (except when `uselibpqcompat=true` is explicitly set), removing the runtime SSL mode deprecation warning risk from ambiguous modes.
+- Logged active issue from `context/current-issues.md`: runtime security warning about implicit SSL mode aliasing in `pg`/`pg-connection-string` that changes in upcoming major versions.
 - Added Prisma helper scripts in `package.json` that run Prisma CLI through `npx node@20` to work around a Node 22 + Prisma 7.8.0 ESM loading issue on Windows.
 - Updated Prisma client output path to `../app/generated/prisma` in `prisma/schema.prisma` so generated client files resolve to the repo-level `app/generated/prisma` directory.
 - Updated `prisma.config.ts` to load `.env.local` first (then `.env`) so existing project environment variables are used by Prisma commands.
@@ -57,3 +61,11 @@ Update this file whenever the current phase, active feature , or implementation 
 - Added `prisma/models/project.prisma` with `Project` and `ProjectCollaborator` models, `ProjectStatus` enum, required relations, constraints, and indexes.
 - Added `lib/prisma.ts` cached singleton that uses `accelerateUrl` for `prisma+postgres://` and `PrismaPg` adapter for direct PostgreSQL connections.
 - Created and applied initial migration `20260504044419_add_project_models` and regenerated Prisma client output in `app/generated/prisma`.
+- Added `app/api/projects/route.ts` (GET/POST) and `app/api/projects/[projectId]/route.ts` (PATCH/DELETE) with Clerk auth checks, owner authorization for rename/delete, default create name fallback, and explicit `401`/`403` responses.
+- Added `lib/project-data.ts` helper to fetch owned and shared projects server-side for `/editor` using Clerk auth + collaborator email matching.
+- Converted `app/editor/page.tsx` into a server component that fetches project data and passes it into `components/editor/editor-home-client.tsx`.
+- Added `hooks/use-project-actions.ts` to manage create/rename/delete dialog state and call `POST /api/projects`, `PATCH /api/projects/[id]`, and `DELETE /api/projects/[id]`.
+- Wired create to slugify name + short suffix for room ID, create with aligned project ID/room ID, and navigate to `/editor/[projectId]` on success.
+- Wired rename to refresh on success and delete to redirect to `/editor` when removing the active workspace (otherwise refresh).
+- Updated create dialog preview to show room ID preview, rename dialog prefill behavior, and delete dialog project name binding with real project data.
+- Updated `app/api/projects/route.ts` create handler to accept optional validated custom project IDs and reject invalid or duplicate IDs.

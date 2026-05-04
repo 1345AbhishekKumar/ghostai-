@@ -1,75 +1,8 @@
-"use client"
+import { EditorHomeClient } from "@/components/editor/editor-home-client"
+import { getEditorProjectsForCurrentUser } from "@/lib/project-data"
 
-import { Plus } from "lucide-react"
+export default async function EditorPage() {
+  const { ownedProjects, sharedProjects } = await getEditorProjectsForCurrentUser()
 
-import { EditorLayout } from "@/components/editor/editor-layout"
-import { ProjectDialogs } from "@/components/editor/project-dialogs"
-import { useProjectDialogs } from "@/components/editor/use-project-dialogs"
-import { Button } from "@/components/ui/button"
-
-export default function EditorPage() {
-  const {
-    ownedProjects,
-    sharedProjects,
-    selectedProject,
-    createProjectName,
-    renameProjectName,
-    createSlugPreview,
-    isCreateDialogOpen,
-    isRenameDialogOpen,
-    isDeleteDialogOpen,
-    loading,
-    setCreateProjectName,
-    setRenameProjectName,
-    openCreateDialog,
-    openRenameDialog,
-    openDeleteDialog,
-    closeDialog,
-    submitCreateProject,
-    submitRenameProject,
-    submitDeleteProject,
-  } = useProjectDialogs()
-
-  return (
-    <EditorLayout
-      ownedProjects={ownedProjects}
-      sharedProjects={sharedProjects}
-      onCreateProject={openCreateDialog}
-      onRenameProject={openRenameDialog}
-      onDeleteProject={openDeleteDialog}
-    >
-      <section className="flex flex-1 items-center justify-center px-6">
-        <div className="space-y-4 text-center">
-          <h1 className="text-2xl font-semibold text-foreground">
-            Create a project or open an existing one
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Start a new architecture workspace, or choose a project from the sidebar.
-          </p>
-          <div className="flex justify-center">
-            <Button type="button" onClick={openCreateDialog}>
-              <Plus className="size-4" />
-              New Project
-            </Button>
-          </div>
-        </div>
-      </section>
-      <ProjectDialogs
-        isCreateDialogOpen={isCreateDialogOpen}
-        isRenameDialogOpen={isRenameDialogOpen}
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        createProjectName={createProjectName}
-        renameProjectName={renameProjectName}
-        createSlugPreview={createSlugPreview}
-        selectedProjectName={selectedProject?.name ?? "this project"}
-        loading={loading}
-        onCreateProjectNameChange={setCreateProjectName}
-        onRenameProjectNameChange={setRenameProjectName}
-        onCloseDialog={closeDialog}
-        onSubmitCreateProject={submitCreateProject}
-        onSubmitRenameProject={submitRenameProject}
-        onSubmitDeleteProject={submitDeleteProject}
-      />
-    </EditorLayout>
-  )
+  return <EditorHomeClient ownedProjects={ownedProjects} sharedProjects={sharedProjects} />
 }

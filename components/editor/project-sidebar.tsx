@@ -4,7 +4,7 @@ import { Pencil, Plus, Trash2, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { type EditorProject } from "@/components/editor/use-project-dialogs"
+import { type EditorProject } from "@/types/editor-project"
 
 interface ProjectSidebarProps {
   isOpen: boolean
@@ -50,7 +50,7 @@ function ProjectList({
         >
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-foreground">{project.name}</p>
-            <p className="truncate text-xs text-muted-foreground">{project.slug}</p>
+            <p className="truncate text-xs text-muted-foreground">{project.roomId}</p>
           </div>
           {showActions ? (
             <div className="flex items-center gap-1">

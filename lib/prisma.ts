@@ -2,11 +2,48 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "@/app/generated/prisma/client";
 
-const databaseUrl = process.env["DATABASE_URL"];
+const rawDatabaseUrl = process.env["DATABASE_URL"];
 
-if (!databaseUrl) {
+if (!rawDatabaseUrl) {
   throw new Error("DATABASE_URL is not set.");
 }
+
+const LEGACY_SSL_MODES = new Set(["prefer", "require", "verify-ca"]);
+
+const normalizeDatabaseUrl = (connectionString: string) => {
+  let parsedUrl: URL;
+
+  try {
+    parsedUrl = new URL(connectionString);
+  } catch (error) {
+    throw new Error("DATABASE_URL is not a valid URL.", { cause: error });
+  }
+
+  if (
+    parsedUrl.protocol !== "postgres:" &&
+    parsedUrl.protocol !== "postgresql:" &&
+    parsedUrl.protocol !== "prisma+postgres:"
+  ) {
+    return connectionString;
+  }
+
+  const isLibpqCompat = parsedUrl.searchParams.get("uselibpqcompat") === "true";
+
+  if (isLibpqCompat) {
+    return connectionString;
+  }
+
+  const sslMode = parsedUrl.searchParams.get("sslmode");
+
+  if (!sslMode || LEGACY_SSL_MODES.has(sslMode)) {
+    parsedUrl.searchParams.set("sslmode", "verify-full");
+    return parsedUrl.toString();
+  }
+
+  return connectionString;
+};
+
+const databaseUrl = normalizeDatabaseUrl(rawDatabaseUrl);
 
 const globalForPrisma = globalThis as {
   prisma?: PrismaClient;

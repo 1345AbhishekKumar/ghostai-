@@ -11,7 +11,7 @@ interface ProjectDialogsProps {
   isDeleteDialogOpen: boolean
   createProjectName: string
   renameProjectName: string
-  createSlugPreview: string
+  createRoomIdPreview: string
   selectedProjectName: string
   loading: {
     create: boolean
@@ -32,7 +32,7 @@ export function ProjectDialogs({
   isDeleteDialogOpen,
   createProjectName,
   renameProjectName,
-  createSlugPreview,
+  createRoomIdPreview,
   selectedProjectName,
   loading,
   onCreateProjectNameChange,
@@ -88,7 +88,7 @@ export function ProjectDialogs({
                 required
               />
               <p className="text-sm text-muted-foreground">
-                Slug preview: <span className="text-foreground">{createSlugPreview}</span>
+                Room ID preview: <span className="text-foreground">{createRoomIdPreview}</span>
               </p>
             </div>
           </DialogPattern>
