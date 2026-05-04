@@ -1,15 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { EditorNavbar } from "@/components/editor/editor-navbar"
-import { ProjectSidebar } from "@/components/editor/project-sidebar"
+import { Bot, FileText, Share2, Sparkles } from "lucide-react"
+import { EditorLayout } from "@/components/editor/editor-layout"
 import { ProjectDialogs } from "@/components/editor/project-dialogs"
 import { ShareDialog } from "@/components/editor/share-dialog"
+import { WorkspaceCanvas } from "@/components/editor/workspace-canvas"
 import { Button } from "@/components/ui/button"
 import { useProjectActions } from "@/hooks/use-project-actions"
 import { type EditorProject } from "@/types/editor-project"
 
 interface EditorWorkspaceClientProps {
+  roomId: string
   project: {
     id: string
     name: string
@@ -19,6 +21,7 @@ interface EditorWorkspaceClientProps {
 }
 
 export function EditorWorkspaceClient({
+  roomId,
   project,
   ownedProjects,
   sharedProjects,
@@ -49,62 +52,60 @@ export function EditorWorkspaceClient({
   const [isShareOpen, setIsShareOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <EditorNavbar
-        isSidebarOpen={true}
-        onToggleSidebar={() => {}}
-      />
-      <div className="flex flex-1">
-        <aside className="border-border border-r bg-background">
-          <ProjectSidebar
-            isOpen={true}
-            onClose={() => {}}
-            onCreateProject={openCreateDialog}
-            onRenameProject={openRenameDialog}
-            onDeleteProject={openDeleteDialog}
-            ownedProjects={ownedProjects}
-            sharedProjects={sharedProjects}
-            currentProjectId={project.id}
-          />
-        </aside>
-
-        <main className="flex flex-1 flex-col">
-          {/* Top navbar with project name */}
-          <div className="border-border bg-background flex h-14 items-center border-b px-6">
-            <h1 className="text-text-primary text-lg font-semibold">
-              {project.name}
-            </h1>
-            <div className="flex flex-1" />
-            <div className="flex gap-2">
-              <Button type="button" onClick={() => setIsShareOpen(true)}>
-                Share
-              </Button>
-              {/* AI sidebar toggle placeholder */}
-              <div className="bg-surface-secondary h-8 w-20 rounded" />
+    <EditorLayout
+      ownedProjects={ownedProjects}
+      sharedProjects={sharedProjects}
+      onCreateProject={openCreateDialog}
+      onRenameProject={openRenameDialog}
+      onDeleteProject={openDeleteDialog}
+      currentProjectId={project.id}
+      title={project.name}
+      navbarActions={
+        <>
+          <Button type="button" variant="outline" onClick={() => setIsShareOpen(true)}>
+            <Share2 className="size-4" />
+            Share
+          </Button>
+          <Button type="button" variant="ghost" size="icon" aria-label="AI assistant panel">
+            <Bot className="size-4" />
+          </Button>
+        </>
+      }
+      rightPanel={
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-border/80 bg-muted/20 p-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Sparkles className="size-4" />
+              AI Assistant
             </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Generate architecture updates, annotate nodes, and draft technical specs.
+            </p>
+            <Button type="button" className="mt-3 w-full" disabled>
+              <Bot className="size-4" />
+              Coming soon
+            </Button>
           </div>
-
-          <ShareDialog open={isShareOpen} onOpenChange={(open) => { if (!open) setIsShareOpen(false) }} projectId={project.id} />
-
-
-
-          {/* Canvas area with placeholder */}
-          <div className="flex flex-1 items-center justify-center bg-gray-950">
-            <div className="text-center">
-              <p className="text-text-secondary text-sm">
-                Canvas placeholder
-              </p>
-              <p className="text-text-muted mt-2 text-xs">
-                Real canvas logic coming soon
-              </p>
+          <div className="rounded-2xl border border-border/80 bg-muted/20 p-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <FileText className="size-4" />
+              Spec Actions
             </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Once your graph is ready, generate a markdown spec for review and download.
+            </p>
+            <Button type="button" variant="outline" className="mt-3 w-full" disabled>
+              Generate Spec
+            </Button>
           </div>
-        </main>
-
-        {/* Right sidebar placeholder for AI chat */}
-        <aside className="border-border bg-background w-64 border-l" />
+        </div>
+      }
+      contentClassName="h-[calc(100vh-3.5rem)]"
+    >
+      <ShareDialog open={isShareOpen} onOpenChange={setIsShareOpen} projectId={project.id} />
+      <div className="h-full w-full">
+        <WorkspaceCanvas roomId={roomId} />
       </div>
-
       <ProjectDialogs
         createProjectName={createProjectName}
         renameProjectName={renameProjectName}
@@ -121,6 +122,6 @@ export function EditorWorkspaceClient({
         onSubmitRenameProject={submitRenameProject}
         onSubmitDeleteProject={submitDeleteProject}
       />
-    </div>
+    </EditorLayout>
   )
 }

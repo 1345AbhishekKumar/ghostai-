@@ -1,6 +1,9 @@
 {
   "version": 1,
   "skills": {
+    "frontend-design": {
+      "path": ".agents/skills/frontend-design"
+    },
     "clerk": {
       "source": "clerk/skills",
       "sourceType": "github",
@@ -36,6 +39,30 @@
       "sourceType": "github",
       "skillPath": "skills/features/clerk-webhooks/SKILL.md",
       "computedHash": "79c157a9459431a6e03359a0ab343d08e8e48bdf1319f207ee542f5ef634a28e"
+    },
+    "liveblocks-best-practices": {
+      "source": "liveblocks/skills",
+      "sourceType": "github",
+      "skillPath": "skills/liveblocks-best-practices/SKILL.md",
+      "computedHash": "df4f54f66e81c580d25c5fee989768368837df694ab63c0f4a0fd70500cd16af"
+    },
+    "next-best-practices": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "skillPath": "skills/next-best-practices/SKILL.md",
+      "computedHash": "db85045827ebeb83ac8dbc992b69188755eeb74dcf01cbf5e694d58aa494a106"
+    },
+    "next-cache-components": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "skillPath": "skills/next-cache-components/SKILL.md",
+      "computedHash": "f835d8226c28abf012cc013928e2627c8a7a046de61127ef229be1711bd1f255"
+    },
+    "next-upgrade": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "skillPath": "skills/next-upgrade/SKILL.md",
+      "computedHash": "e3aeb1f9e8a68d24df0c1c2e3c8ab97ede09a7251a2c76988318d02254346979"
     },
     "prisma-cli": {
       "source": "prisma/skills",
