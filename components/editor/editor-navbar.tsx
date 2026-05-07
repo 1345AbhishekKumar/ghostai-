@@ -2,7 +2,7 @@
 
 import { type ReactNode } from "react"
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react"
-import { UserButton } from "@clerk/nextjs"
+import dynamic from "next/dynamic"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -14,6 +14,11 @@ interface EditorNavbarProps {
   actions?: ReactNode
   className?: string
 }
+
+const ClerkUserButton = dynamic(
+  () => import("@clerk/nextjs").then((mod) => mod.UserButton),
+  { ssr: false }
+)
 
 export function EditorNavbar({
   isSidebarOpen,
@@ -52,7 +57,7 @@ export function EditorNavbar({
       </div>
       <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
         {actions}
-        <UserButton />
+        <ClerkUserButton />
       </div>
     </header>
   )

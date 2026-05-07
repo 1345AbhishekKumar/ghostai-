@@ -8,7 +8,7 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Current Goal
 
-- Proceed to the next feature implementation unit.
+- Trigger.dev setup scaffold.
 
 ## Completed
 
@@ -24,14 +24,23 @@ Update this file whenever the current phase, active feature , or implementation 
 - Feature Spec 10: Liveblocks realtime collaboration setup.
 - Feature Spec 11: Base collaborative canvas (Liveblocks room wrapper + React Flow sync + shared canvas types).
 - Feature Spec 12: Shape panel drag-and-drop node creation on the collaborative canvas.
+- Feature Spec 13: Proper node shape renderer (CSS/SVG) and shape drag ghost preview.
+- Feature Spec 14: Canvas node resizing and inline label editing connected to collaborative state.
+- Feature Spec 15: Floating color toolbar for node background and text color pairs.
+- Feature Spec 16: Custom edge rendering, connection handles, and inline label editing.
+- Feature Spec 17: Starter template library.
+- Feature Spec 18: Present Avatars & Cursor.
+- Feature Spec 19: Canvas Ergonomics (Zoom, Undo/Redo, Shortcuts).
+- Feature Spec 20: AI Sidebar Shell (Assistant and Spec tabs, toggling, chat UI).
+- Feature Spec 21: Canvas Autosave (Vercel Blob persistence, initial load logic, debounced hook, status indicator).
+- Trigger.dev SDK installed and root scaffold added with `trigger.config.ts` plus a starter task example.
 
 ## In Progress
 
 - None currently.
-
 ## Next Up
 
-- Proceed to the next feature implementation unit.
+- None currently.
 
 ## Open Questions
 
@@ -40,9 +49,12 @@ Update this file whenever the current phase, active feature , or implementation 
 ## Architecture Decisions
 
 - Adopted a protected-first `proxy.ts` strategy where only `/`, sign-in, and sign-up routes are public; all other routes require Clerk authentication.
+- Used Vercel Blob for canvas JSON persistence and Prisma for metadata (Feature Spec 21).
 
 ## Session Notes
 
+- Fixed React Flow error #008 by moving to a single loose-handle set in `components/editor/canvas-basic-node.tsx` (`top/right/bottom/left` source handles only) and normalizing legacy `source-*`/`target-*` handle IDs to neutral IDs in `components/editor/workspace-canvas.tsx` for both connect-time and loaded/rendered edges.
+- Adjusted canvas autosave to match the private Vercel Blob store: uploads now use private access and reads go through the blob SDK instead of unauthenticated fetch.
 - Verified `context/current-issues.md` against current editor code and fixed confirmed regressions: canvas was boxed by top border + workspace card strip, layout sidebars were shrinking canvas instead of floating over it, and sidebar close state could leave a 1px remnant.
 - Updated `editor-layout` so main canvas area stays full-width while both side panels float above it (`fixed` overlays with elevated styling instead of layout columns/margins).
 - Updated `project-sidebar` hidden transform to move fully off-screen (`-translate-x-[calc(100%+1px)]`) so no peeking edge remains when closed.
@@ -75,7 +87,7 @@ Update this file whenever the current phase, active feature , or implementation 
 - Added `components/editor/editor-layout.tsx` to compose navbar + floating sidebar in a reusable editor page shell.
 - Wrapped `app/layout.tsx` with `ClerkProvider` using Clerk `dark` theme and appearance variables mapped to app CSS variables.
 - Added reusable auth shell at `components/auth/auth-shell.tsx` and created `app/sign-in/[[...sign-in]]/page.tsx` and `app/sign-up/[[...sign-up]]/page.tsx`.
-- Added `proxy.ts` at project root with protected-first route guarding based on existing Clerk sign-in/sign-up env vars.
+- Added `proxy.ts` at project root with protected-first body guarding based on existing Clerk sign-in/sign-up env vars.
 - Updated `/` to redirect authenticated users to `/editor` and unauthenticated users to sign-in.
 - Moved editor shell to `app/editor/page.tsx` and added Clerk `UserButton` to the editor navbar.
 - Lint and build now pass with the auth integration changes.
@@ -92,6 +104,11 @@ Update this file whenever the current phase, active feature , or implementation 
 - Converted `app/editor/page.tsx` into a server component that fetches project data and passes it into `components/editor/editor-home-client.tsx`.
 - Implementing Feature Spec 09: Share dialog — added `components/editor/share-dialog.tsx`, UI in `components/editor/editor-workspace-client.tsx`, and new API route `app/api/projects/[projectId]/collaborators/route.ts` for listing/inviting/removing collaborators (owner-only for invite/remove).
 - Refined Feature Spec 09 UI: redesigned share dialog with improved hierarchy, owner badge row, collaborator avatars/initials fallback, inline error states, and copy-link feedback; updated collaborators API GET access checks so only owner/collaborators can view and exposed role-aware payload for read-only collaborator experience.
+- Completed Feature Spec 13 from `context/feature-specs/13-node-shape.md`.
+- Replaced placeholder node rendering in `components/editor/canvas-basic-node.tsx` with shape-aware rendering: CSS-based rectangle/pill/circle plus scalable SVG diamond/hexagon/cylinder variants.
+- Kept node handles and collaborative flow wiring intact while adding shape-aware border behavior (subtle at rest, brighter when selected).
+- Added shape drag ghost preview wiring between `components/editor/shape-panel.tsx` and `components/editor/workspace-canvas.tsx`, with cursor-follow behavior and cleanup on drop/cancel.
+- Confirmed `bun run build` succeeds with Feature Spec 13 changes.
 - Added `hooks/use-project-actions.ts` to manage create/rename/delete dialog state and call `POST /api/projects`, `PATCH /api/projects/[id]`, and `DELETE /api/projects/[id]`.
 - Wired create to slugify name + short suffix for room ID, create with aligned project ID/room ID, and navigate to `/editor/[projectId]` on success.
 - Wired rename to refresh on success and delete to redirect to `/editor` when removing the active workspace (otherwise refresh).
@@ -101,6 +118,24 @@ Update this file whenever the current phase, active feature , or implementation 
 - Added `lib/liveblocks.ts` with a cached `@liveblocks/node` client and deterministic cursor-color helper derived from a fixed palette and user ID hash.
 - Added `app/api/liveblocks-auth/route.ts` (`POST`) to require Clerk auth, verify project access via `checkProjectAccess`, ensure the project room exists, and return a Liveblocks session token scoped to the project room with user metadata attached.
 - Redesigned the complete editor dashboard visual hierarchy across `editor-navbar`, `project-sidebar`, `editor-layout`, `editor-home-client`, and `editor-workspace-client` to use a cohesive dark workspace style with layered panels, stronger spacing rhythm, and a consistent top-level dashboard structure.
-- Improved workspace presentation with a dedicated right-side assistant/spec panel, upgraded canvas loading/error surfaces, and refined project metadata strip above the canvas.
+- Improved workspace editor with a dedicated right-side assistant/spec panel, upgraded canvas loading/error surfaces, and refined project metadata strip above the canvas.
 - Updated project list rows to be directly navigable links in the sidebar and aligned action affordances with clearer active-state styling.
 - Fixed editor view token mismatches in `access-denied.tsx` and removed the `share-dialog` effect-driven state update causing the React hooks lint error.
+- Completed Feature Spec 14 from `context/feature-specs/14-node-editing.md`.
+- Added resizing using `NodeResizer` from `@xyflow/react` to `components/editor/canvas-basic-node.tsx` with a `minWidth` and `minHeight` array. Selected nodes will present subtle resize handlers using classes matching the dark canvas UI (`!h-2.5 !w-2.5 !bg-white/80`).
+- Added inline label editing seamlessly in `CanvasShapeSurface` by capturing `doubleClick` on the internal node surface allowing state-driven textarea rendering while retaining centering.
+- Editing text updates the label synchronously avoiding manual pan/drag interferences via `nodrag nopan` classes.
+- Used `Math.max(1, editValue.split('\n').length)` rows mapping inside the `textarea` block to properly size content fields up to dynamic vertical heights without introducing scrollbars or layout shifts.
+- Intersecting state closures on `Escape` or `Shift+Enter` keystrokes.
+- Verified that `bun run build` succeeds completely without TS errors indicating safe `@xyflow/react` and layout modifications.
+- Completed Feature Spec 15 from `context/feature-specs/15-node-color-toolbar.md`.
+- Added a floating color toolbar to `components/editor/canvas-basic-node.tsx` above selected nodes with `nodrag nopan` utility classes.
+- Wired color picking to update `data.color` via `updateNodeData` and trigger synchronous `getTextColor` update applied to node surfaces.
+- Kept palette confined to predefined variants from `NODE_COLORS` array enforcing strict color contrast paired combinations.
+- Added visual interaction hover glow shadows matched to node text colors leveraging absolute layered `div`s.
+- Completed Feature Spec 18: Starter template library. Implemented `starter-templates.ts` data definitions and `starter-templates-modal.tsx` with import functionality. Wired import button to editor navbar and state-synchronized node/edge replacement.
+- Fixed editor hydration mismatch by deferring Clerk `UserButton` rendering to the client.
+- Moved `ReactFlowProvider` to wrap the editor workspace client so `useReactFlow` consumers share the correct provider and template imports work reliably.
+- Completed Feature Spec 19 (Canvas Ergonomics): Added a floating control bar for zoom and undo/redo, wired to React Flow and Liveblocks. Added useKeyboardShortcuts hook for canvas shortcuts, ignoring editable fields. Removed the MiniMap from the bottom right.
+- Completed Feature Spec 20 (AI Sidebar Shell): Added a dedicated right-side AI sidebar with Assistant and Specs tabs. Implemented toggling from the navbar, chat-like interface for the assistant, and a scrollable spec list placeholder. Refactored EditorLayout to manage the right panel as a floating overlay with slide-in animations.
+- Completed Feature Spec 21 (Canvas Autosave): Installed `@vercel/blob`, created `PUT`/`GET` `/api/projects/[projectId]/canvas` to store and retrieve canvas state using the Prisma project record's `canvasJsonPath`, added `useCanvasAutosave` hook with debouncing, implemented load-on-mount logic in `workspace-canvas`, and rendered a status indicator in the navbar.

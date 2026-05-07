@@ -1,3 +1,4 @@
+import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "@/app/generated/prisma/client";
@@ -56,8 +57,11 @@ const createPrismaClient = () => {
     });
   }
 
+  const pool = new pg.Pool({ connectionString: databaseUrl });
+  const adapter = new PrismaPg(pool);
+
   return new PrismaClient({
-    adapter: new PrismaPg(databaseUrl),
+    adapter,
   });
 };
 

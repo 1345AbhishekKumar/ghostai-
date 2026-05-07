@@ -89,4 +89,4 @@ export interface CanvasNodeData extends Record<string, unknown> {
 }
 
 export type CanvasNode = Node<CanvasNodeData, typeof CANVAS_NODE_TYPE>
-export type CanvasEdge = Edge<Record<string, never>, typeof CANVAS_EDGE_TYPE>
+export type CanvasEdge = Edge<{ label: string }, typeof CANVAS_EDGE_TYPE>
