@@ -5,13 +5,16 @@ declare global {
     // Each user's Presence, for useMyPresence, useOthers, etc.
     Presence: {
       cursor: { x: number; y: number } | null;
-      isThinking: boolean;
+      thinking: boolean;
     };
 
     // The Storage tree for the room, for useMutation, useStorage, etc.
-    Storage: Record<string, never>;
-      // Example, a conflict-free list
-      // animals: LiveList<string>;
+    Storage: {
+      nodes: import("@liveblocks/client").LiveObject<Record<string, any>>;
+      edges: import("@liveblocks/client").LiveList<any>;
+      "ai-status-feed": import("@liveblocks/client").LiveObject<{ text?: string }>;
+      "ai-chat": import("@liveblocks/client").LiveList<import("@liveblocks/client").LiveObject<any>>;
+    };
 
     // Custom user info set when authenticating with a secret key
     UserMeta: {

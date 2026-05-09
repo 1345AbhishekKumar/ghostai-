@@ -12,6 +12,7 @@ import { type DragEvent } from "react"
 
 import {
   CANVAS_SHAPE_DRAG_MIME,
+  type CanvasShapeDragPayload,
   DEFAULT_SHAPE_SIZES,
   NODE_SHAPES,
   serializeCanvasShapeDragPayload,
@@ -26,16 +27,38 @@ const shapeIcons = {
   hexagon: Hexagon,
 } as const
 
-export function ShapePanel() {
+interface ShapePanelProps {
+  onShapeDragStart?: (payload: CanvasShapeDragPayload, position: { x: number; y: number }) => void
+  onShapeDragEnd?: () => void
+}
+
+const transparentDragImage =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+
+export function ShapePanel({
+  onShapeDragStart: handleShapeDragStart,
+  onShapeDragEnd: handleShapeDragEnd,
+}: ShapePanelProps) {
   const onShapeDragStart = (event: DragEvent<HTMLButtonElement>, shape: (typeof NODE_SHAPES)[number]) => {
-    const payload = serializeCanvasShapeDragPayload({
+    const dragPayload: CanvasShapeDragPayload = {
       shape,
       size: DEFAULT_SHAPE_SIZES[shape],
-    })
+    }
+    const payload = serializeCanvasShapeDragPayload(dragPayload)
 
+    const image = new Image()
+    image.src = transparentDragImage
+
+    event.dataTransfer.setDragImage(image, 0, 0)
     event.dataTransfer.setData(CANVAS_SHAPE_DRAG_MIME, payload)
     event.dataTransfer.setData("text/plain", payload)
     event.dataTransfer.effectAllowed = "copy"
+
+    handleShapeDragStart?.(dragPayload, { x: event.clientX, y: event.clientY })
+  }
+
+  const onShapeDragEnd = () => {
+    handleShapeDragEnd?.()
   }
 
   return (
@@ -50,6 +73,7 @@ export function ShapePanel() {
               type="button"
               draggable
               onDragStart={(event) => onShapeDragStart(event, shape)}
+              onDragEnd={onShapeDragEnd}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-transparent text-muted-foreground transition hover:border-border hover:bg-background hover:text-foreground"
               aria-label={`Drag ${shape} shape onto canvas`}
               title={`Drag ${shape}`}

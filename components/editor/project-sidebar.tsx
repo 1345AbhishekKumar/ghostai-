@@ -118,7 +118,7 @@ export function ProjectSidebar({
       ) : null}
       <aside
         className={`fixed top-14 left-0 z-40 h-[calc(100vh-3.5rem)] w-80 max-w-[calc(100vw-0.5rem)] border-r border-border/80 bg-card/88 p-4 shadow-2xl shadow-background/65 backdrop-blur transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "-translate-x-[calc(100%+1px)]"
+          isOpen ? "translate-x-0" : "-translate-x-[calc(100%+80px)]"
         }`}
         aria-hidden={!isOpen}
       >
