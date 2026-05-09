@@ -1,7 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { Bot, Share2, LayoutTemplate, Cloud, CloudUpload, CheckCircle2, AlertCircle } from "lucide-react"
+import { useState, useMemo } from "react"
+import { LiveList, LiveObject } from "@liveblocks/client"
+import {
+  ClientSideSuspense,
+  LiveblocksProvider,
+  RoomProvider,
+} from "@liveblocks/react/suspense"
+import { Bot, Share2, LayoutTemplate, Cloud, CloudUpload, CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
 import { EditorLayout } from "@/components/editor/editor-layout"
 import { ProjectDialogs } from "@/components/editor/project-dialogs"
 import { ShareDialog } from "@/components/editor/share-dialog"
@@ -57,6 +63,16 @@ function SaveStatusIndicator({ status }: { status: SaveStatus }) {
     <div className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-destructive">
       <AlertCircle className="size-3.5" />
       <span>Error saving</span>
+    </div>
+  )
+}
+
+function CanvasLoadingState() {
+  return (
+    <div className="flex h-full items-center justify-center bg-background">
+      <div className="rounded-2xl border border-border/80 bg-card/70 px-5 py-4">
+        <p className="text-sm text-muted-foreground">Initializing workspace...</p>
+      </div>
     </div>
   )
 }
@@ -136,7 +152,7 @@ function EditorWorkspaceClientInner({
           </Button>
         </>
       }
-      rightPanel={<AiSidebar />}
+      rightPanel={<AiSidebar roomId={roomId} projectId={project.id} />}
       contentClassName="h-[calc(100vh-3.5rem)]"
     >
 
@@ -166,8 +182,25 @@ function EditorWorkspaceClientInner({
 export function EditorWorkspaceClient(props: EditorWorkspaceClientProps) {
   return (
     <ReactFlowProvider>
-      <EditorWorkspaceClientInner {...props} />
+      <LiveblocksProvider authEndpoint="/api/liveblocks-auth">
+        <RoomProvider
+          id={props.roomId}
+          initialPresence={{
+            cursor: null,
+            thinking: false,
+          }}
+          initialStorage={{
+            nodes: new LiveObject({}),
+            edges: new LiveList([]),
+            "ai-status-feed": new LiveObject({}),
+            "ai-chat": new LiveList([]),
+          }}
+        >
+          <ClientSideSuspense fallback={<CanvasLoadingState />}>
+            {() => <EditorWorkspaceClientInner {...props} />}
+          </ClientSideSuspense>
+        </RoomProvider>
+      </LiveblocksProvider>
     </ReactFlowProvider>
   )
 }
-

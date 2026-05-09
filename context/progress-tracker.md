@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Current Phase
 
-- In progress
+- Finalizing feature specs and preparing for deployment.
 
 ## Current Goal
 
-- Trigger.dev setup scaffold.
+- Feature Spec 27: Technical Specification Generation Flow.
 
 ## Completed
 
@@ -31,16 +31,25 @@ Update this file whenever the current phase, active feature , or implementation 
 - Feature Spec 17: Starter template library.
 - Feature Spec 18: Present Avatars & Cursor.
 - Feature Spec 19: Canvas Ergonomics (Zoom, Undo/Redo, Shortcuts).
+- Trigger.dev SDK installed and root scaffold added with `trigger.config.ts` plus a starter task example.
 - Feature Spec 20: AI Sidebar Shell (Assistant and Spec tabs, toggling, chat UI).
 - Feature Spec 21: Canvas Autosave (Vercel Blob persistence, initial load logic, debounced hook, status indicator).
-- Trigger.dev SDK installed and root scaffold added with `trigger.config.ts` plus a starter task example.
+- Feature Spec 22: Design Agent API logic (Trigger.dev task wiring, TaskRun tracking, and token issuance).
+- Feature Spec 23: AI Design Agent Logic (Trigger.dev task implementing Gemini + Liveblocks mutations, real-time presence, and status tracking).
+- Feature Spec 24: AI Presence State (Shared AI activity indicators, status feed, and cursor thinking indicators).
+- Feature Spec 25: Sidebar Chat Feed (Collaborative real-time room chat using separate Liveblocks `ai-chat` feed).
+- Feature Spec 26: Design Agent Frontend (Consolidated AI design API, real-time status tracking, and final AI message logic).
+- Feature Spec 27: Technical Specification Generation Flow (Backend trigger route, token route, and Trigger.dev task).
+- Feature Spec 28: Technical Specification Download (Prisma ProjectSpec model, Vercel Blob persistence, and secure download route).
+- Feature Spec 29: Spec UI Integration (Spec list in AI sidebar, preview modal with Markdown content, and download actions).
 
 ## In Progress
 
 - None currently.
+
 ## Next Up
 
-- None currently.
+- Final deployment preparation and end-to-end testing.
 
 ## Open Questions
 
@@ -50,9 +59,41 @@ Update this file whenever the current phase, active feature , or implementation 
 
 - Adopted a protected-first `proxy.ts` strategy where only `/`, sign-in, and sign-up routes are public; all other routes require Clerk authentication.
 - Used Vercel Blob for canvas JSON persistence and Prisma for metadata (Feature Spec 21).
+- Moved Liveblocks `RoomProvider` to `EditorWorkspaceClient` to allow all editor components (Canvas and Sidebar) to share the same collaborative state (Feature Spec 24).
+- Persisted generated specs with Vercel Blob and Prisma, providing a secure authenticated download route (Feature Spec 28).
+- Implemented a list and preview UI for specs in the AI sidebar, reusing the secure download route for content fetching to avoid direct blob access (Feature Spec 29).
 
 ## Session Notes
 
+- Completed Feature Spec 29 (Spec UI Integration).
+- Created `GET /api/projects/[projectId]/specs` to list project specifications with synthesized filenames.
+- Implemented `SpecPreviewModal` component using shadcn/ui `Dialog` and `ScrollArea` for Markdown-formatted text preview.
+- Updated `AiSidebar` to include the `Specs` tab with a scrollable list, metadata display, and integrated preview/download actions.
+- Wired the "Generate Spec" button in the sidebar to the `/api/ai/spec` trigger flow with real-time status monitoring via `ai-status-feed`.
+- Verified that `bun run build` (and `npm run build`) succeeds.
+- Completed Feature Spec 28 (Technical Specification Download).
+- Added `ProjectSpec` model to Prisma and ran migration.
+- Updated `trigger/generate-spec.ts` to upload generated Markdown to Vercel Blob and save metadata to Prisma.
+- Created `GET /api/projects/[projectId]/specs/[specId]/download` with project access verification.
+- Verified that `bun run build` succeeds.
+- Completed Feature Spec 27 (Technical Specification Generation Flow).
+- Added `trigger/generate-spec.ts` using `schemaTask` and Gemini `gemini-1.5-pro` to generate Markdown specs.
+- Created `POST /api/ai/spec` to trigger the task and track ownership via `TaskRun`.
+- Created `POST /api/ai/spec/token` to issue public Trigger.dev tokens for run monitoring.
+- Verified that `bun run build` succeeds.
+- Completed Feature Spec 26 (Design Agent Frontend).
+- Completed Feature Spec 25 (Sidebar Chat Feed).
+- Added `ChatMessageSchema` to `types/tasks.ts`.
+- Updated `liveblocks.config.ts` to include `ai-chat` storage.
+- Updated `EditorWorkspaceClient` to initialize `ai-chat` as an empty `LiveList`.
+- Updated `AiSidebar` to render chat messages, handle sending via `useMutation`, and scroll to bottom automatically.
+- Verified that `bun run build` succeeds.
+- Completed Feature Spec 24 (AI Presence State).
+- Added `ai-status-feed` to Liveblocks Storage for shared AI progress visibility.
+- Updated `WorkspaceCanvas` to show a thinking spinner in live cursor badges when a participant's `thinking` presence is true.
+- Refactored `EditorWorkspaceClient` to wrap both the canvas and AI sidebar in a single `RoomProvider`, enabling shared storage access.
+- Updated `AiSidebar` to subscribe to the shared `ai-status-feed` and disable chat inputs while the AI is working.
+- Updated `designAgent` task to publish its progress to the shared `ai-status-feed` in addition to updating presence and metadata.
 - Fixed React Flow error #008 by moving to a single loose-handle set in `components/editor/canvas-basic-node.tsx` (`top/right/bottom/left` source handles only) and normalizing legacy `source-*`/`target-*` handle IDs to neutral IDs in `components/editor/workspace-canvas.tsx` for both connect-time and loaded/rendered edges.
 - Adjusted canvas autosave to match the private Vercel Blob store: uploads now use private access and reads go through the blob SDK instead of unauthenticated fetch.
 - Verified `context/current-issues.md` against current editor code and fixed confirmed regressions: canvas was boxed by top border + workspace card strip, layout sidebars were shrinking canvas instead of floating over it, and sidebar close state could leave a 1px remnant.
@@ -139,3 +180,29 @@ Update this file whenever the current phase, active feature , or implementation 
 - Completed Feature Spec 19 (Canvas Ergonomics): Added a floating control bar for zoom and undo/redo, wired to React Flow and Liveblocks. Added useKeyboardShortcuts hook for canvas shortcuts, ignoring editable fields. Removed the MiniMap from the bottom right.
 - Completed Feature Spec 20 (AI Sidebar Shell): Added a dedicated right-side AI sidebar with Assistant and Specs tabs. Implemented toggling from the navbar, chat-like interface for the assistant, and a scrollable spec list placeholder. Refactored EditorLayout to manage the right panel as a floating overlay with slide-in animations.
 - Completed Feature Spec 21 (Canvas Autosave): Installed `@vercel/blob`, created `PUT`/`GET` `/api/projects/[projectId]/canvas` to store and retrieve canvas state using the Prisma project record's `canvasJsonPath`, added `useCanvasAutosave` hook with debouncing, implemented load-on-mount logic in `workspace-canvas`, and rendered a status indicator in the navbar.
+- Completed Feature Spec 22: Design Agent API logic. Implemented `POST /api/projects/[projectId]/design` with token validation, triggered `trigger.run`, and stored `TokenUse` in the DB. Set up task run status polling in `lib/trigger-tasks.ts`.
+- Completed Feature Spec 23: AI Design Agent Logic. Implemented `trigger.task` `designAgent` using `gemini-2.0-flash-exp-image`, published status to `ai-status-feed`, and wrote `canvasJsonPath` + spec + node metadata to project Blob storage. Added `runId` tracking in `projectData` (DB). Cleaned up legacy mock fetch code.
+- Verified build, server, and client (cursor/avatar rendering, chat input disabled while thinking) all pass with Feature Spec 23 in place.
+- Fixed React Flow error #008 by moving to a single loose-handle set in `components/editor/canvas-basic-node.tsx` (`top/right/bottom/left` source handles only) and normalizing legacy `source-*`/`target-*` handle IDs to neutral IDs in `components/editor/workspace-canvas.tsx` for both connect-time and loaded/rendered edges.
+- Adjusted canvas autosave to match the private Vercel Blob store: uploads now use private access and reads go through the blob SDK instead of unauthenticated fetch.
+- Removed the workspace top metadata strip in `editor-workspace-client` so the dotted canvas fills the editor area naturally.
+- Completed Feature Spec 24: AI Presence State. Added `ai-status-feed` to Liveblocks Storage for shared AI progress visibility. Updated `WorkspaceCanvas` to show a thinking spinner in live cursor badges when a participant's `thinking` presence is true. Refactored `EditorWorkspaceClient` to wrap both the canvas and AI sidebar in a single `RoomProvider`, enabling shared storage access. Updated `AiSidebar` to subscribe to the shared `ai-status-feed` and disable chat inputs while the AI is working. Updated `designAgent` task to publish its progress to the shared `ai-status-feed` in addition to updating presence and metadata. Verified that `bun run build` succeeds.
+- Completed Feature Spec 25: Sidebar Chat Feed. Added `ChatMessageSchema` to `types/tasks.ts`. Updated `liveblocks.config.ts` to include `ai-chat` storage. Updated `EditorWorkspaceClient` to initialize `ai-chat` as an empty `LiveList`. Updated `AiSidebar` to render chat messages, handle sending via `useMutation`, and scroll to bottom automatically. Verified that `bun run build` succeeds.
+- Completed Feature Spec 26: Design Agent Frontend. Integrated design agent API with realtime polling, status display, and final message formatting. Verified that `bun run build` succeeds.
+-Completed feature spec 27: Technical Specification Generation Flow.
+    - Added `trigger/generate-spec.ts` using `schemaTask` and Gemini `gemini-1.5-pro` to generate Markdown specs.
+    - Created `POST /api/ai/spec` to trigger the task and track ownership via `TaskRun`.
+    - Created `POST /api/ai/spec/token` to issue public Trigger.dev tokens for run monitoring.
+    - Verified that `bun run build` succeeds.
+-Completed feature spec 28: Technical Specification Download (Prisma ProjectSpec model, Vercel Blob persistence, and secure download route).
+    - Added `ProjectSpec` model to Prisma and ran migration.
+    - Updated `trigger/generate-spec.ts` to upload generated Markdown to Vercel Blob and save metadata to Prisma.
+    - Created `GET /api/projects/[projectId]/specs/[specId]/download` with project access verification.
+    - Verified that `bun run build` succeeds.
+-Completed feature spec 29: Spec UI Integration (Spec list in AI sidebar, preview modal with Markdown content, and download actions).
+    - Created `GET /api/projects/[projectId]/specs` to list project specifications with synthesized filenames.
+    - Created `GET /api/projects/[projectId]/specs/[specId]/download` with project access verification.
+    - Implemented `SpecPreviewModal` component using shadcn/ui `Dialog` and `ScrollArea` for Markdown-formatted text preview.
+    - Updated `AiSidebar` to include the `Specs` tab with a scrollable list, metadata display, and integrated preview/download actions.
+    - Wired the "Generate Spec" button in the sidebar to the `/api/ai/spec` trigger flow with real-time status monitoring via `ai-status-feed`.
+    - Verified that `bun run build` (and `npm run build`) succeeds.

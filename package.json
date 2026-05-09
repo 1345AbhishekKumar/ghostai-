@@ -13,7 +13,8 @@
     "prisma:init": "bun run prisma -- init --datasource-provider postgresql --output ../app/generated/prisma",
     "prisma:generate": "bun run prisma -- generate",
     "prisma:migrate:dev": "bun run prisma -- migrate dev",
-    "prisma:studio": "bun run prisma -- studio"
+    "prisma:studio": "bun run prisma -- studio",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.68",

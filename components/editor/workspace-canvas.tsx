@@ -2,8 +2,6 @@
 
 import {
   type DragEvent,
-  type ReactNode,
-  Component,
   useCallback,
   useMemo,
   useRef,
@@ -21,9 +19,6 @@ import {
   type Connection,
 } from "@xyflow/react"
 import {
-  ClientSideSuspense,
-  LiveblocksProvider,
-  RoomProvider,
   useMyPresence,
   useOthers,
   useUndo,
@@ -31,7 +26,7 @@ import {
   useCanUndo,
   useCanRedo,
 } from "@liveblocks/react/suspense"
-import { ZoomIn, ZoomOut, Maximize, Undo2, Redo2 } from "lucide-react"
+import { ZoomIn, ZoomOut, Maximize, Undo2, Redo2, Loader2 } from "lucide-react"
 
 import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts"
 import { useCanvasAutosave, type SaveStatus } from "@/hooks/use-canvas-autosave"
@@ -54,10 +49,6 @@ import {
 interface WorkspaceCanvasProps {
   roomId: string
   onSaveStatusChange?: (status: SaveStatus) => void
-}
-
-interface CanvasErrorBoundaryState {
-  hasError: boolean
 }
 
 interface ShapeDragPreviewState {
@@ -96,46 +87,6 @@ function sanitizeLoadedEdges(loadedEdges: CanvasEdge[]): CanvasEdge[] {
     sourceHandle: normalizeHandleId(edge.sourceHandle),
     targetHandle: normalizeHandleId(edge.targetHandle),
   }))
-}
-
-class CanvasErrorBoundary extends Component<
-  { children: ReactNode },
-  CanvasErrorBoundaryState
-> {
-  public state: CanvasErrorBoundaryState = { hasError: false }
-
-  public static getDerivedStateFromError(): CanvasErrorBoundaryState {
-    return { hasError: true }
-  }
-
-  public render() {
-    if (this.state.hasError) {
-      return (
-        <div className="flex h-full items-center justify-center bg-background px-6 text-center">
-          <div className="rounded-2xl border border-border/80 bg-card/70 px-6 py-5 shadow-xl shadow-background/30">
-            <p className="text-sm font-medium text-foreground">
-              Unable to connect to the collaborative canvas.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Please refresh and try again.
-            </p>
-          </div>
-        </div>
-      )
-    }
-
-    return this.props.children
-  }
-}
-
-function CanvasLoadingState() {
-  return (
-    <div className="flex h-full items-center justify-center bg-background">
-      <div className="rounded-2xl border border-border/80 bg-card/70 px-5 py-4">
-        <p className="text-sm text-muted-foreground">Loading collaborative canvas...</p>
-      </div>
-    </div>
-  )
 }
 
 function SyncedCanvasContent({ roomId, onSaveStatusChange }: { roomId: string, onSaveStatusChange?: (status: SaveStatus) => void }) {
@@ -332,9 +283,10 @@ function SyncedCanvasContent({ roomId, onSaveStatusChange }: { roomId: string, o
                   <polygon points="0,0 12,6 0,12" fill={cursorColor} />
                 </svg>
                 <div
-                  className="rounded-full px-2 py-1 text-xs text-white shadow-sm"
+                  className="rounded-full px-2 py-1 text-xs text-white shadow-sm flex items-center gap-1.5"
                   style={{ backgroundColor: cursorColor }}
                 >
+                  {presence.thinking && <Loader2 className="size-2.5 animate-spin" />}
                   {info?.displayName || "Collaborator"}
                 </div>
               </div>
@@ -434,22 +386,6 @@ function CanvasControlBar() {
 
 export function WorkspaceCanvas({ roomId, onSaveStatusChange }: WorkspaceCanvasProps) {
   return (
-    <div className="h-full w-full">
-      <CanvasErrorBoundary>
-        <LiveblocksProvider authEndpoint="/api/liveblocks-auth">
-          <RoomProvider
-            id={roomId}
-            initialPresence={{
-              cursor: null,
-              thinking: false,
-            }}
-          >
-            <ClientSideSuspense fallback={<CanvasLoadingState />}>
-              {() => <SyncedCanvasContent roomId={roomId} onSaveStatusChange={onSaveStatusChange} />}
-            </ClientSideSuspense>
-          </RoomProvider>
-        </LiveblocksProvider>
-      </CanvasErrorBoundary>
-    </div>
+    <SyncedCanvasContent roomId={roomId} onSaveStatusChange={onSaveStatusChange} />
   )
 }
