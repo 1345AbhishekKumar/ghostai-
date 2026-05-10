@@ -9,9 +9,14 @@ declare global {
     };
 
     // The Storage tree for the room, for useMutation, useStorage, etc.
+    // NOTE: useLiveblocksFlow creates storage["flow"] = LiveObject({ nodes: LiveMap, edges: LiveMap })
+    // Do NOT declare top-level "nodes"/"edges" — they live nested under "flow".
     Storage: {
-      nodes: import("@liveblocks/client").LiveObject<Record<string, any>>;
-      edges: import("@liveblocks/client").LiveList<any>;
+      // Managed by useLiveblocksFlow (DEFAULT_STORAGE_KEY = "flow")
+      flow: import("@liveblocks/client").LiveObject<{
+        nodes: import("@liveblocks/client").LiveMap<string, import("@liveblocks/client").LiveObject<any>>;
+        edges: import("@liveblocks/client").LiveMap<string, import("@liveblocks/client").LiveObject<any>>;
+      }>;
       "ai-status-feed": import("@liveblocks/client").LiveObject<{ text?: string }>;
       "ai-chat": import("@liveblocks/client").LiveList<import("@liveblocks/client").LiveObject<any>>;
     };

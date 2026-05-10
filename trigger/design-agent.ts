@@ -85,7 +85,10 @@ async function getCanvasStorage(roomId: string) {
     });
 
     if (!response.ok) return null;
-    return await response.json();
+    const raw = await response.json();
+    // useLiveblocksFlow stores everything under storage["flow"] = { nodes: {}, edges: {} }
+    // The REST API returns: { data: { flow: { nodes: {...}, edges: {...} }, ... } }
+    return raw;
   } catch (error) {
     logger.error("Failed to fetch canvas storage", { error });
     return null;
@@ -171,8 +174,12 @@ export const designAgent = task({
     metadata.set("status", fetchStatus);
     await updateAiStatus(roomId, fetchStatus);
     const storage = await getCanvasStorage(roomId);
-    const nodes = storage?.data?.nodes || {};
-    const edges = storage?.data?.edges || [];
+    // useLiveblocksFlow stores under storage["flow"] = LiveObject({ nodes: LiveMap, edges: LiveMap })
+    // REST API serialises this as: data.flow.nodes = { id: {...}, ... }, data.flow.edges = { id: {...}, ... }
+    const flowData = storage?.data?.flow;
+    const nodes = flowData?.nodes || {};
+    const edgesRaw = flowData?.edges;
+    const edges = edgesRaw && !Array.isArray(edgesRaw) ? edgesRaw : {};
 
     // 2. Generate design actions
     const brainstormStatus = "Brainstorming design...";
@@ -208,6 +215,7 @@ export const designAgent = task({
         - Layout: Spread nodes out reasonably (e.g., increments of 300px). Avoid overlapping.
         - Consistency: If updating existing nodes, keep their IDs. For new nodes, generate unique IDs like 'node-service-1'.
         - Edges: Connect services logically.
+        - CRITICAL: You MUST generate 'addNode' and 'addEdge' actions to visually represent the architecture requested by the user. Do NOT just explain it in text. The canvas needs the structured data to render the diagram.
 
         ACTIONS SUPPORTED:
         - addNode: Add a new node.
@@ -227,17 +235,29 @@ export const designAgent = task({
     await updatePresence(roomId, "Drawing...", true);
 
     // 3. Convert actions to JSON patches
+    // IMPORTANT: useLiveblocksFlow stores everything under storage["flow"] = { nodes: LiveMap, edges: LiveMap }
+    // So all paths must be /flow/nodes/{id} and /flow/edges/{id}, NOT /nodes/{id}
     const patches: any[] = [];
-    let currentEdges = Array.isArray(edges) ? [...edges] : Object.values(edges || {});
-    
+    const currentEdgesMap: Record<string, any> = { ...edges };
+
+    // Ensure /flow container exists before writing into it.
+    // If the room is brand-new, storage.data.flow will be undefined.
+    if (!flowData) {
+      patches.push({ op: "add", path: "/flow", value: { nodes: {}, edges: {} } });
+    } else {
+      // Ensure sub-keys exist if they were somehow missing
+      if (!flowData.nodes) patches.push({ op: "add", path: "/flow/nodes", value: {} });
+      if (!flowData.edges) patches.push({ op: "add", path: "/flow/edges", value: {} });
+    }
+
     for (const action of result.actions) {
       if (action.type === "addNode") {
         const width = action.width || DEFAULT_SHAPE_SIZES[action.shape].width;
         const height = action.height || DEFAULT_SHAPE_SIZES[action.shape].height;
-        
+
         patches.push({
           op: "add",
-          path: `/nodes/${action.id}`,
+          path: `/flow/nodes/${action.id}`,
           value: {
             id: action.id,
             type: CANVAS_NODE_TYPE,
@@ -252,30 +272,34 @@ export const designAgent = task({
         });
       } else if (action.type === "updateNode") {
         const node = nodes[action.id];
-        
-        if (action.label !== undefined) patches.push({ op: "add", path: `/nodes/${action.id}/data/label`, value: action.label });
-        if (action.color !== undefined) patches.push({ op: "add", path: `/nodes/${action.id}/data/color`, value: action.color });
-        if (action.x !== undefined) patches.push({ op: "add", path: `/nodes/${action.id}/position/x`, value: action.x });
-        if (action.y !== undefined) patches.push({ op: "add", path: `/nodes/${action.id}/position/y`, value: action.y });
-        
+
+        if (action.label !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/data/label`, value: action.label });
+        if (action.color !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/data/color`, value: action.color });
+        if (action.x !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/position/x`, value: action.x });
+        if (action.y !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/position/y`, value: action.y });
+
         if (action.width !== undefined || action.height !== undefined) {
           if (node && !node.style) {
-             patches.push({ 
-               op: "add", 
-               path: `/nodes/${action.id}/style`, 
-               value: {
-                 width: action.width ?? DEFAULT_SHAPE_SIZES[node.data?.shape as CanvasNodeShape]?.width ?? 240,
-                 height: action.height ?? DEFAULT_SHAPE_SIZES[node.data?.shape as CanvasNodeShape]?.height ?? 120
-               }
-             });
-             node.style = {}; // local mutation so next checks see it
+            patches.push({
+              op: "add",
+              path: `/flow/nodes/${action.id}/style`,
+              value: {
+                width: action.width ?? DEFAULT_SHAPE_SIZES[node.data?.shape as CanvasNodeShape]?.width ?? 240,
+                height: action.height ?? DEFAULT_SHAPE_SIZES[node.data?.shape as CanvasNodeShape]?.height ?? 120,
+              },
+            });
+            node.style = {}; // local mutation so next checks see it
           } else {
-             if (action.width !== undefined) patches.push({ op: "add", path: `/nodes/${action.id}/style/width`, value: action.width });
-             if (action.height !== undefined) patches.push({ op: "add", path: `/nodes/${action.id}/style/height`, value: action.height });
+            if (action.width !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/style/width`, value: action.width });
+            if (action.height !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/style/height`, value: action.height });
           }
         }
       } else if (action.type === "deleteNode") {
-        patches.push({ op: "remove", path: `/nodes/${action.id}` });
+        if (nodes[action.id]) {
+          patches.push({ op: "remove", path: `/flow/nodes/${action.id}` });
+        } else {
+          logger.warn(`Node not found for deletion: ${action.id}`);
+        }
       } else if (action.type === "addEdge") {
         const newEdge = {
           id: action.id,
@@ -286,15 +310,14 @@ export const designAgent = task({
         };
         patches.push({
           op: "add",
-          path: "/edges/-", // Append to edges list
+          path: `/flow/edges/${action.id}`,
           value: newEdge,
         });
-        currentEdges.push(newEdge);
+        currentEdgesMap[action.id] = newEdge;
       } else if (action.type === "deleteEdge") {
-        const edgeIndex = currentEdges.findIndex((e: any) => e.id === action.id);
-        if (edgeIndex !== -1) {
-          patches.push({ op: "remove", path: `/edges/${edgeIndex}` });
-          currentEdges.splice(edgeIndex, 1);
+        if (currentEdgesMap[action.id]) {
+          patches.push({ op: "remove", path: `/flow/edges/${action.id}` });
+          delete currentEdgesMap[action.id];
         } else {
           logger.warn(`Edge not found for deletion: ${action.id}`);
         }

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  let body: any
+  let body: unknown
   try {
     body = await request.json()
   } catch {
@@ -48,5 +48,5 @@ export async function POST(request: Request) {
     expirationTime: "1h",
   })
 
-  return Response.json({ token })
+  return Response.json({ publicToken: token })
 }

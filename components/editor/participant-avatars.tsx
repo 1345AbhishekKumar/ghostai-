@@ -1,3 +1,6 @@
+"use client"
+
+import Image from "next/image"
 import { useOthers } from "@liveblocks/react/suspense";
 import { useUser } from "@clerk/nextjs";
 
@@ -30,10 +33,12 @@ export function ParticipantAvatars() {
             title={user.info?.displayName || "Collaborator"}
           >
             {user.info?.avatarUrl ? (
-              <img
+              <Image
                 src={user.info.avatarUrl}
                 alt={user.info?.displayName || "Avatar"}
-                className="w-full h-full object-cover"
+                width={32}
+                height={32}
+                className="size-full object-cover"
               />
             ) : (
               <span className="text-xs font-medium text-white">

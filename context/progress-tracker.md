@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Current Phase
 
-- Finalizing feature specs and preparing for deployment.
+- Bug fixing and stability improvements.
 
 ## Current Goal
 
-- Feature Spec 27: Technical Specification Generation Flow.
+- Fix runtime issues: Liveblocks storage type mismatch, canvas rendering, autosave 404 handling, and specs route 404.
 
 ## Completed
 
@@ -64,6 +64,11 @@ Update this file whenever the current phase, active feature , or implementation 
 - Implemented a list and preview UI for specs in the AI sidebar, reusing the secure download route for content fetching to avoid direct blob access (Feature Spec 29).
 
 ## Session Notes
+
+- Bug Fix Session (2026-05-09): Fixed 4 runtime issues from `context/current-issues.md`.
+  - **Problem 1 & 2 (Critical):** `INVALID_STORAGE_MUTATION_REQUEST: Invalid index: edge-gateway-to-cache` — Root cause: `useLiveblocksFlow` expects both `nodes` and `edges` as `LiveMap<string, ...>`. The `RoomProvider` was initializing `nodes` as `LiveObject({})` and `edges` as `LiveList([])`. Changed both to `LiveMap([])` in `editor-workspace-client.tsx`. Updated `design-agent.ts` to read edges as an object map (not array) and use map-style delete/update patterns.
+  - **Problem 3 (DarkReader):** Hydration mismatch caused by the DarkReader browser extension injecting `style` attributes into SVG icons. Not fixable in application code — this is a browser extension side-effect acknowledged in the React error message.
+  - **Problem 4 (Autosave 404):** Two causes: (a) autosave fired after project deletion — fixed by silently returning `idle` on 404; (b) specs route was returning 403 using `NextResponse` + old `checkProjectAccess` pattern — rewrote specs route to use `auth()` directly, return proper `404` for missing projects and `403` for forbidden access, consistent with other routes.
 
 - Completed Feature Spec 29 (Spec UI Integration).
 - Created `GET /api/projects/[projectId]/specs` to list project specifications with synthesized filenames.
@@ -206,3 +211,4 @@ Update this file whenever the current phase, active feature , or implementation 
     - Updated `AiSidebar` to include the `Specs` tab with a scrollable list, metadata display, and integrated preview/download actions.
     - Wired the "Generate Spec" button in the sidebar to the `/api/ai/spec` trigger flow with real-time status monitoring via `ai-status-feed`.
     - Verified that `bun run build` (and `npm run build`) succeeds.
+    - Spec preview modal upgraded to use `react-markdown` (v10) for proper rendered Markdown output — headings, lists, code blocks, tables, and blockquotes now styled via Tailwind arbitrary selectors on the article wrapper.

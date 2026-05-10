@@ -18,6 +18,7 @@ import {
   useReactFlow,
   type Connection,
 } from "@xyflow/react"
+import { LiveObject, LiveMap } from "@liveblocks/client"
 import {
   useMyPresence,
   useOthers,
@@ -25,6 +26,7 @@ import {
   useRedo,
   useCanUndo,
   useCanRedo,
+  useMutation,
 } from "@liveblocks/react/suspense"
 import { ZoomIn, ZoomOut, Maximize, Undo2, Redo2, Loader2 } from "lucide-react"
 
@@ -96,7 +98,7 @@ function SyncedCanvasContent({ roomId, onSaveStatusChange }: { roomId: string, o
       nodes: { initial: [] },
       edges: { initial: [] },
     })
-  const { screenToFlowPosition, setNodes, setEdges } = useReactFlow<CanvasNode, CanvasEdge>()
+  const { screenToFlowPosition } = useReactFlow<CanvasNode, CanvasEdge>()
   const [, updateMyPresence] = useMyPresence()
   const others = useOthers()
   const nodeCounterRef = useRef(0)
@@ -112,11 +114,42 @@ function SyncedCanvasContent({ roomId, onSaveStatusChange }: { roomId: string, o
     onSaveStatusChange?.(saveStatus)
   }, [saveStatus, onSaveStatusChange])
 
+  // Write blob-persisted canvas data into Liveblocks storage so all collaborators see it.
+  // Must use a mutation — NOT setNodes/setEdges from useReactFlow — because useLiveblocksFlow
+  // drives <ReactFlow nodes={}> from Liveblocks storage and ignores local React Flow state.
+  const initFlowFromBlob = useMutation(
+    ({ storage }, blobNodes: CanvasNode[], blobEdges: CanvasEdge[]) => {
+      let flow = storage.get("flow")
+      // useLiveblocksFlow may not have initialised the "flow" key yet on very first render;
+      // create it if absent so we can write into it.
+      if (!flow) {
+        storage.set(
+          "flow",
+          new LiveObject({
+            nodes: new LiveMap<string, LiveObject<any>>(),
+            edges: new LiveMap<string, LiveObject<any>>(),
+          })
+        )
+        flow = storage.get("flow")!
+      }
+      const nodesMap = flow.get("nodes") as LiveMap<string, LiveObject<any>>
+      const edgesMap = flow.get("edges") as LiveMap<string, LiveObject<any>>
+      for (const node of blobNodes) {
+        nodesMap.set(node.id, new LiveObject(node as any))
+      }
+      for (const edge of blobEdges) {
+        edgesMap.set(edge.id, new LiveObject(edge as any))
+      }
+    },
+    []
+  )
+
   useEffect(() => {
     if (hasLoadedRef.current) return
     hasLoadedRef.current = true
 
     async function loadCanvas() {
+      // If Liveblocks already has data (e.g. a collaborator added nodes), skip blob load.
       if (nodes.length > 0 || edges.length > 0) {
         return
       }
@@ -125,11 +158,12 @@ function SyncedCanvasContent({ roomId, onSaveStatusChange }: { roomId: string, o
         const response = await fetch(`/api/projects/${roomId}/canvas`)
         if (response.ok) {
           const data = await response.json()
-          if (data.canvas && data.canvas.nodes) {
-            setNodes(data.canvas.nodes)
-            if (Array.isArray(data.canvas.edges)) {
-              setEdges(sanitizeLoadedEdges(data.canvas.edges as CanvasEdge[]))
-            }
+          if (data.canvas && Array.isArray(data.canvas.nodes) && data.canvas.nodes.length > 0) {
+            const sanitizedEdges = Array.isArray(data.canvas.edges)
+              ? sanitizeLoadedEdges(data.canvas.edges as CanvasEdge[])
+              : []
+            // Write into Liveblocks storage — this propagates to all collaborators in real-time
+            initFlowFromBlob(data.canvas.nodes as CanvasNode[], sanitizedEdges)
           }
         }
       } catch (error) {
@@ -138,7 +172,7 @@ function SyncedCanvasContent({ roomId, onSaveStatusChange }: { roomId: string, o
     }
 
     loadCanvas()
-  }, [roomId, nodes.length, edges.length, setNodes, setEdges])
+  }, [roomId, nodes.length, edges.length, initFlowFromBlob])
 
   const onMouseMove = useCallback(
     (event: React.MouseEvent) => {

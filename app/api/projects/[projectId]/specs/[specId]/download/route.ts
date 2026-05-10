@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { get } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { checkProjectAccess } from "@/lib/project-access";
 
@@ -32,28 +31,31 @@ export async function GET(_request: Request, context: DownloadRouteContext) {
       return NextResponse.json({ error: "Spec not found" }, { status: 404 });
     }
 
-    // 3. Fetch from Vercel Blob
-    const blob = await get(spec.filePath, {
-      access: "private",
+    // 3. Fetch the blob content from Vercel Blob storage using the stored URL.
+    //    Private blobs are fetched server-side using the BLOB_READ_WRITE_TOKEN
+    //    set in the environment. Passing the token as a Bearer header gives access.
+    const blobResponse = await fetch(spec.filePath, {
+      headers: {
+        Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+      },
     });
 
-    if (!blob || blob.statusCode !== 200) {
-      return NextResponse.json({ error: "Failed to fetch spec from storage" }, { status: 500 });
+    if (!blobResponse.ok) {
+      console.error("Blob fetch failed:", blobResponse.status, blobResponse.statusText);
+      return NextResponse.json(
+        { error: "Failed to fetch spec from storage" },
+        { status: 500 }
+      );
     }
 
-    if (!blob.stream) {
-        return NextResponse.json({ error: "No stream available for spec" }, { status: 500 });
-    }
-
-    // 4. Return as downloadable file
-    const response = new Response(blob.stream);
-    response.headers.set("Content-Type", "text/markdown");
-    response.headers.set(
-      "Content-Disposition",
-      `attachment; filename="spec-${projectId}-${specId}.md"`
-    );
-
-    return response;
+    // 4. Return as downloadable Markdown file, streaming the response body
+    return new Response(blobResponse.body, {
+      headers: {
+        "Content-Type": "text/markdown; charset=utf-8",
+        "Content-Disposition": `attachment; filename="spec-${projectId}-${specId}.md"`,
+        "Cache-Control": "private, no-cache",
+      },
+    });
   } catch (error) {
     console.error("Spec Download Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

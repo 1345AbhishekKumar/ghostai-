@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { checkProjectAccess } from "@/lib/project-access";
 
 interface SpecsRouteContext {
   params: Promise<{
@@ -10,26 +9,44 @@ interface SpecsRouteContext {
 
 export async function GET(_request: Request, context: SpecsRouteContext) {
   try {
-    const { projectId } = await context.params;
-
-    // 1. Verify project access
-    const project = await checkProjectAccess(projectId);
-    if (!project) {
-      return NextResponse.json({ error: "Forbidden or Not Found" }, { status: 403 });
+    const { userId } = await auth();
+    if (!userId) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Fetch specs for the project
-    const specs = await prisma.projectSpec.findMany({
-      where: {
-        projectId: projectId,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+    const { projectId } = await context.params;
+
+    // 1. Find project
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: { collaborators: { select: { email: true } } },
     });
 
-    // 3. Return spec list with metadata
-    // We'll synthesize a "filename" from the createdAt and projectId since it's not in the DB
+    if (!project) {
+      return Response.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    // 2. Verify access — owner fast path, then collaborator check
+    const isOwner = project.ownerId === userId;
+    if (!isOwner) {
+      const user = await currentUser();
+      const userEmails =
+        user?.emailAddresses.map((e) => e.emailAddress.toLowerCase()) ?? [];
+      const isCollaborator = project.collaborators.some((c) =>
+        userEmails.includes(c.email.toLowerCase())
+      );
+      if (!isCollaborator) {
+        return Response.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
+
+    // 3. Fetch specs for the project
+    const specs = await prisma.projectSpec.findMany({
+      where: { projectId },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // 4. Return spec list with synthesized filename
     const formattedSpecs = specs.map((spec) => ({
       id: spec.id,
       projectId: spec.projectId,
@@ -38,9 +55,9 @@ export async function GET(_request: Request, context: SpecsRouteContext) {
       filePath: spec.filePath,
     }));
 
-    return NextResponse.json(formattedSpecs);
+    return Response.json(formattedSpecs);
   } catch (error) {
     console.error("Specs List Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
