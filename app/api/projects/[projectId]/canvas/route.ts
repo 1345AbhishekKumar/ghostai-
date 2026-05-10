@@ -114,10 +114,23 @@ export async function PUT(request: Request, context: CanvasRouteContext) {
         contentType: "application/json",
       })
 
-      await prisma.project.update({
-        where: { id: projectId },
-        data: { canvasJsonPath: blob.url },
-      })
+      try {
+        await prisma.project.update({
+          where: { id: projectId },
+          data: { canvasJsonPath: blob.url },
+        })
+      } catch (updateError) {
+        // P2025: Record not found — project was deleted between access check and update
+        if (
+          typeof updateError === "object" &&
+          updateError !== null &&
+          "code" in updateError &&
+          (updateError as { code: string }).code === "P2025"
+        ) {
+          return Response.json({ error: "Project not found" }, { status: 404 })
+        }
+        throw updateError
+      }
 
       return Response.json({ success: true, url: blob.url })
     } catch (error) {

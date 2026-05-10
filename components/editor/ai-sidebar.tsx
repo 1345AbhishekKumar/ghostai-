@@ -1,6 +1,7 @@
 "use client"
 
 import { FileText, Send, Sparkles, MessageSquare, Loader2, User, Download, ExternalLink, Plus } from "lucide-react"
+import Image from "next/image"
 import { useState, useMemo, useRef, useEffect } from "react"
 import { useRealtimeRun } from "@trigger.dev/react-hooks"
 import { useStorage, useMutation, useSelf } from "@liveblocks/react/suspense"
@@ -288,7 +289,7 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
                     {message.senderId !== user?.id && (
                       <div className="size-5 overflow-hidden rounded-full bg-muted flex items-center justify-center">
                         {message.senderAvatar ? (
-                          <img src={message.senderAvatar} alt="" className="size-full object-cover" />
+                          <Image src={message.senderAvatar} alt="" width={20} height={20} className="size-full object-cover rounded-full" />
                         ) : (
                           <User className="size-3 text-muted-foreground" />
                         )}

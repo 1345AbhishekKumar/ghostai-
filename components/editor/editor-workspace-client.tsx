@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { LiveList, LiveObject } from "@liveblocks/client"
+import { LiveList, LiveMap, LiveObject } from "@liveblocks/client"
 import {
   ClientSideSuspense,
   LiveblocksProvider,
@@ -190,8 +190,13 @@ export function EditorWorkspaceClient(props: EditorWorkspaceClientProps) {
             thinking: false,
           }}
           initialStorage={{
-            nodes: new LiveObject({}),
-            edges: new LiveList([]),
+            // "flow" must be present to satisfy the Storage type.
+            // If the room already has a "flow" entry in Liveblocks cloud,
+            // this initial value is ignored and the persisted data takes over.
+            flow: new LiveObject({
+              nodes: new LiveMap(),
+              edges: new LiveMap(),
+            }),
             "ai-status-feed": new LiveObject({}),
             "ai-chat": new LiveList([]),
           }}

@@ -35,7 +35,12 @@ export function useCanvasAutosave(
         })
 
         if (!response.ok) {
-          throw new Error("Save failed")
+          // 404 means the project was deleted — silently stop saving
+          if (response.status === 404) {
+            setSaveStatus("idle")
+            return
+          }
+          throw new Error(`Save failed (${response.status})`)
         }
 
         setSaveStatus("saved")
