@@ -294,7 +294,7 @@ export const designAgent = task({
         const edgeIndex = currentEdges.findIndex((e: any) => e.id === action.id);
         if (edgeIndex !== -1) {
           patches.push({ op: "remove", path: `/edges/${edgeIndex}` });
-          currentEdges.splice(edgeIndex, 1);
+          // currentEdges.splice(edgeIndex, 1); // fix index shift bug
         } else {
           logger.warn(`Edge not found for deletion: ${action.id}`);
         }
