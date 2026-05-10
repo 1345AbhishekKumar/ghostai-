@@ -285,6 +285,17 @@ function SyncedCanvasContent({ roomId, onSaveStatusChange }: { roomId: string, o
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         className="h-full w-full"
+        deleteKeyCode={null}
+        // Pan only on middle-click (1) or right-click (2) — frees left-click drag for rubber-band selection
+        panOnDrag={[1, 2]}
+        // Scroll wheel zooms (mouse) — do NOT use panOnScroll which steals the wheel for panning
+        panOnScroll={false}
+        // Space + left-drag to pan (Figma-style); middle/right drag also pans via panOnDrag above
+        panActivationKeyCode="Space"
+        // Rubber-band box selection on left-click drag over empty canvas
+        selectionOnDrag={true}
+        // Shift-click to add individual nodes/edges to the selection
+        multiSelectionKeyCode="Shift"
         onDragOver={(e) => {
           e.preventDefault()
           e.dataTransfer.dropEffect = "copy"
