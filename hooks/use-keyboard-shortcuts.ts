@@ -43,6 +43,13 @@ export function useKeyboardShortcuts<TNode extends Node, TEdge extends Edge>({
       } else if (isCmdOrCtrl && e.key.toLowerCase() === "y") {
         e.preventDefault()
         redo()
+      } else if (e.key === "Backspace" || e.key === "Delete") {
+        const selectedNodes = reactFlowInstance.getNodes().filter(n => n.selected)
+        const selectedEdges = reactFlowInstance.getEdges().filter(e => e.selected)
+        if (selectedNodes.length > 0 || selectedEdges.length > 0) {
+          e.preventDefault()
+          reactFlowInstance.deleteElements({ nodes: selectedNodes, edges: selectedEdges })
+        }
       }
     }
 

@@ -3,13 +3,13 @@ import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { z } from "zod";
 
-import { 
-  NODE_COLORS, 
-  NODE_SHAPES, 
-  CANVAS_NODE_TYPE, 
-  CANVAS_EDGE_TYPE, 
+import {
+  NODE_COLORS,
+  NODE_SHAPES,
+  CANVAS_NODE_TYPE,
+  CANVAS_EDGE_TYPE,
   DEFAULT_SHAPE_SIZES,
-  type CanvasNodeShape
+  type CanvasNodeShape,
 } from "../types/canvas";
 
 interface DesignAgentPayload {
@@ -22,7 +22,12 @@ const LIVEBLOCKS_API_BASE = "https://api.liveblocks.io/v2";
 
 const AI_CURSOR_COLOR = "#6457f9"; // AI accent color from UI context
 
-async function updatePresence(roomId: string, status: string, isThinking: boolean, ttl: number = 30) {
+async function updatePresence(
+  roomId: string,
+  status: string,
+  isThinking: boolean,
+  ttl: number = 30,
+) {
   if (!LIVEBLOCKS_SECRET_KEY) return;
 
   try {
@@ -78,11 +83,14 @@ async function getCanvasStorage(roomId: string) {
   if (!LIVEBLOCKS_SECRET_KEY) return null;
 
   try {
-    const response = await fetch(`${LIVEBLOCKS_API_BASE}/rooms/${roomId}/storage`, {
-      headers: {
-        Authorization: `Bearer ${LIVEBLOCKS_SECRET_KEY}`,
+    const response = await fetch(
+      `${LIVEBLOCKS_API_BASE}/rooms/${roomId}/storage`,
+      {
+        headers: {
+          Authorization: `Bearer ${LIVEBLOCKS_SECRET_KEY}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) return null;
     const raw = await response.json();
@@ -99,14 +107,17 @@ async function applyJsonPatch(roomId: string, patch: any[]) {
   if (!LIVEBLOCKS_SECRET_KEY || patch.length === 0) return;
 
   try {
-    const response = await fetch(`${LIVEBLOCKS_API_BASE}/rooms/${roomId}/storage/json-patch`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${LIVEBLOCKS_SECRET_KEY}`,
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${LIVEBLOCKS_API_BASE}/rooms/${roomId}/storage/json-patch`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${LIVEBLOCKS_SECRET_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(patch),
       },
-      body: JSON.stringify(patch),
-    });
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -178,10 +189,10 @@ export const designAgent = task({
     // REST API serialises this as: data.flow.nodes = { id: {...}, ... }, data.flow.edges = { id: {...}, ... }
     const flowObj = storage?.data?.flow;
     const flowData = flowObj?.data || flowObj;
-    
+
     const nodesObj = flowData?.nodes;
     const nodes = nodesObj?.data || nodesObj || {};
-    
+
     const edgesObj = flowData?.edges;
     const edgesRaw = edgesObj?.data || edgesObj;
     const edges = edgesRaw && !Array.isArray(edgesRaw) ? edgesRaw : {};
@@ -285,7 +296,7 @@ COLOR SYSTEM
 ━━━━━━━━━━━━━━━━━━━━
 
 Allowed colors:
-${NODE_COLORS.map(c => c.fill).join(", ")}
+${NODE_COLORS.map((c) => c.fill).join(", ")}
 
 Apply colors consistently by architecture domain.
 
@@ -522,7 +533,7 @@ FINAL RULE
 Return ONLY structured JSON actions for a beautiful, professional, readable architecture diagram.
       `,
       // prompt: `
-      //   You are Ghost AI, a senior system architect and designer. 
+      //   You are Ghost AI, a senior system architect and designer.
       //   Your goal is to update a collaborative system design canvas based on the user's prompt.
 
       //   USER PROMPT: "${prompt}"
@@ -557,7 +568,10 @@ Return ONLY structured JSON actions for a beautiful, professional, readable arch
       // `,
     });
 
-    logger.info("Generated design actions", { count: result.actions.length, explanation: result.explanation });
+    logger.info("Generated design actions", {
+      count: result.actions.length,
+      explanation: result.explanation,
+    });
     const applyStatus = "Applying changes to canvas...";
     metadata.set("status", applyStatus);
     await updateAiStatus(roomId, applyStatus);
@@ -574,17 +588,24 @@ Return ONLY structured JSON actions for a beautiful, professional, readable arch
     // Ensure /flow container exists before writing into it.
     // If the room is brand-new, storage.data.flow will be undefined.
     if (!flowObj) {
-      patches.push({ op: "add", path: "/flow", value: { nodes: {}, edges: {} } });
+      patches.push({
+        op: "add",
+        path: "/flow",
+        value: { nodes: {}, edges: {} },
+      });
     } else {
       // Ensure sub-keys exist if they were somehow missing
-      if (!nodesObj) patches.push({ op: "add", path: "/flow/nodes", value: {} });
-      if (!edgesObj) patches.push({ op: "add", path: "/flow/edges", value: {} });
+      if (!nodesObj)
+        patches.push({ op: "add", path: "/flow/nodes", value: {} });
+      if (!edgesObj)
+        patches.push({ op: "add", path: "/flow/edges", value: {} });
     }
 
     for (const action of result.actions) {
       if (action.type === "addNode") {
         const width = action.width || DEFAULT_SHAPE_SIZES[action.shape].width;
-        const height = action.height || DEFAULT_SHAPE_SIZES[action.shape].height;
+        const height =
+          action.height || DEFAULT_SHAPE_SIZES[action.shape].height;
 
         patches.push({
           op: "add",
@@ -604,10 +625,30 @@ Return ONLY structured JSON actions for a beautiful, professional, readable arch
       } else if (action.type === "updateNode") {
         const node = nodes[action.id];
 
-        if (action.label !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/data/label`, value: action.label });
-        if (action.color !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/data/color`, value: action.color });
-        if (action.x !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/position/x`, value: action.x });
-        if (action.y !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/position/y`, value: action.y });
+        if (action.label !== undefined)
+          patches.push({
+            op: "add",
+            path: `/flow/nodes/${action.id}/data/label`,
+            value: action.label,
+          });
+        if (action.color !== undefined)
+          patches.push({
+            op: "add",
+            path: `/flow/nodes/${action.id}/data/color`,
+            value: action.color,
+          });
+        if (action.x !== undefined)
+          patches.push({
+            op: "add",
+            path: `/flow/nodes/${action.id}/position/x`,
+            value: action.x,
+          });
+        if (action.y !== undefined)
+          patches.push({
+            op: "add",
+            path: `/flow/nodes/${action.id}/position/y`,
+            value: action.y,
+          });
 
         if (action.width !== undefined || action.height !== undefined) {
           if (node && !node.style) {
@@ -615,19 +656,39 @@ Return ONLY structured JSON actions for a beautiful, professional, readable arch
               op: "add",
               path: `/flow/nodes/${action.id}/style`,
               value: {
-                width: action.width ?? DEFAULT_SHAPE_SIZES[node.data?.shape as CanvasNodeShape]?.width ?? 240,
-                height: action.height ?? DEFAULT_SHAPE_SIZES[node.data?.shape as CanvasNodeShape]?.height ?? 120,
+                width:
+                  action.width ??
+                  DEFAULT_SHAPE_SIZES[node.data?.shape as CanvasNodeShape]
+                    ?.width ??
+                  240,
+                height:
+                  action.height ??
+                  DEFAULT_SHAPE_SIZES[node.data?.shape as CanvasNodeShape]
+                    ?.height ??
+                  120,
               },
             });
             node.style = {}; // local mutation so next checks see it
           } else {
-            if (action.width !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/style/width`, value: action.width });
-            if (action.height !== undefined) patches.push({ op: "add", path: `/flow/nodes/${action.id}/style/height`, value: action.height });
+            if (action.width !== undefined)
+              patches.push({
+                op: "add",
+                path: `/flow/nodes/${action.id}/style/width`,
+                value: action.width,
+              });
+            if (action.height !== undefined)
+              patches.push({
+                op: "add",
+                path: `/flow/nodes/${action.id}/style/height`,
+                value: action.height,
+              });
           }
         }
       } else if (action.type === "deleteNode") {
         if (!userWantsDelete) {
-          logger.warn(`Ignoring deleteNode for ${action.id} because user didn't explicitly ask to delete`);
+          logger.warn(
+            `Ignoring deleteNode for ${action.id} because user didn't explicitly ask to delete`,
+          );
           continue;
         }
         if (nodes[action.id]) {
@@ -651,7 +712,9 @@ Return ONLY structured JSON actions for a beautiful, professional, readable arch
         currentEdgesMap[action.id] = newEdge;
       } else if (action.type === "deleteEdge") {
         if (!userWantsDelete) {
-          logger.warn(`Ignoring deleteEdge for ${action.id} because user didn't explicitly ask to delete`);
+          logger.warn(
+            `Ignoring deleteEdge for ${action.id} because user didn't explicitly ask to delete`,
+          );
           continue;
         }
         if (currentEdgesMap[action.id]) {
