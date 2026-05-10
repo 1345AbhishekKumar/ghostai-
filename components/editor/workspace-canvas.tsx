@@ -280,6 +280,8 @@ function SyncedCanvasContent({ roomId, onSaveStatusChange }: { roomId: string, o
         edgeTypes={edgeTypes}
         connectionMode={ConnectionMode.Loose}
         fitView
+        minZoom={0.01}
+        maxZoom={256}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         className="h-full w-full"

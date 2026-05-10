@@ -176,9 +176,14 @@ export const designAgent = task({
     const storage = await getCanvasStorage(roomId);
     // useLiveblocksFlow stores under storage["flow"] = LiveObject({ nodes: LiveMap, edges: LiveMap })
     // REST API serialises this as: data.flow.nodes = { id: {...}, ... }, data.flow.edges = { id: {...}, ... }
-    const flowData = storage?.data?.flow;
-    const nodes = flowData?.nodes || {};
-    const edgesRaw = flowData?.edges;
+    const flowObj = storage?.data?.flow;
+    const flowData = flowObj?.data || flowObj;
+    
+    const nodesObj = flowData?.nodes;
+    const nodes = nodesObj?.data || nodesObj || {};
+    
+    const edgesObj = flowData?.edges;
+    const edgesRaw = edgesObj?.data || edgesObj;
     const edges = edgesRaw && !Array.isArray(edgesRaw) ? edgesRaw : {};
 
     // 2. Generate design actions
@@ -212,8 +217,9 @@ export const designAgent = task({
           - 'hexagon': external systems, boundaries.
           - 'rectangle': general purpose, default.
         - Color Palette (hex fills): ${NODE_COLORS.map(c => c.fill).join(", ")}. Use these for semantic grouping.
-        - Layout: Spread nodes out reasonably (e.g., increments of 300px). Avoid overlapping.
-        - Consistency: If updating existing nodes, keep their IDs. For new nodes, generate unique IDs like 'node-service-1'.
+        - Layout: Spread nodes out WIDELY in a grid-like fashion (e.g., increments of 400px horizontally and 300px vertically). NEVER place nodes at the exact same coordinates. Strictly avoid any overlapping.
+        - Consistency: If updating existing nodes, keep their IDs. For new nodes, generate strictly unique IDs (e.g., 'node-service-12345' with random numbers). NEVER reuse an existing node ID for a newly created node.
+        - Preservation: DO NOT delete or overwrite existing nodes and edges unless the user explicitly asks you to remove, replace, or clear them. If the user asks for a new diagram, build it alongside the existing one by choosing coordinates that are far away from any existing nodes.
         - Edges: Connect services logically.
         - CRITICAL: You MUST generate 'addNode' and 'addEdge' actions to visually represent the architecture requested by the user. Do NOT just explain it in text. The canvas needs the structured data to render the diagram.
 
@@ -234,6 +240,8 @@ export const designAgent = task({
     await updateAiStatus(roomId, applyStatus);
     await updatePresence(roomId, "Drawing...", true);
 
+    const userWantsDelete = /delete|remove|clear|reset|replace/i.test(prompt);
+
     // 3. Convert actions to JSON patches
     // IMPORTANT: useLiveblocksFlow stores everything under storage["flow"] = { nodes: LiveMap, edges: LiveMap }
     // So all paths must be /flow/nodes/{id} and /flow/edges/{id}, NOT /nodes/{id}
@@ -242,12 +250,12 @@ export const designAgent = task({
 
     // Ensure /flow container exists before writing into it.
     // If the room is brand-new, storage.data.flow will be undefined.
-    if (!flowData) {
+    if (!flowObj) {
       patches.push({ op: "add", path: "/flow", value: { nodes: {}, edges: {} } });
     } else {
       // Ensure sub-keys exist if they were somehow missing
-      if (!flowData.nodes) patches.push({ op: "add", path: "/flow/nodes", value: {} });
-      if (!flowData.edges) patches.push({ op: "add", path: "/flow/edges", value: {} });
+      if (!nodesObj) patches.push({ op: "add", path: "/flow/nodes", value: {} });
+      if (!edgesObj) patches.push({ op: "add", path: "/flow/edges", value: {} });
     }
 
     for (const action of result.actions) {
@@ -295,6 +303,10 @@ export const designAgent = task({
           }
         }
       } else if (action.type === "deleteNode") {
+        if (!userWantsDelete) {
+          logger.warn(`Ignoring deleteNode for ${action.id} because user didn't explicitly ask to delete`);
+          continue;
+        }
         if (nodes[action.id]) {
           patches.push({ op: "remove", path: `/flow/nodes/${action.id}` });
         } else {
@@ -315,6 +327,10 @@ export const designAgent = task({
         });
         currentEdgesMap[action.id] = newEdge;
       } else if (action.type === "deleteEdge") {
+        if (!userWantsDelete) {
+          logger.warn(`Ignoring deleteEdge for ${action.id} because user didn't explicitly ask to delete`);
+          continue;
+        }
         if (currentEdgesMap[action.id]) {
           patches.push({ op: "remove", path: `/flow/edges/${action.id}` });
           delete currentEdgesMap[action.id];

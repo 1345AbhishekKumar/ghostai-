@@ -65,7 +65,9 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
   const fetchSpecs = async () => {
     setIsLoadingSpecs(true)
     try {
-      const response = await fetch(`/api/projects/${projectId}/specs`)
+      const response = await fetch(`/api/projects/${projectId}/specs?_t=${Date.now()}`, {
+        cache: "no-store"
+      })
       if (response.ok) {
         const data = await response.json()
         setSpecs(data)
@@ -221,8 +223,9 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
     }
   }
 
-  const aiStatus = sharedAiStatus || (run?.metadata?.status as string) || (run?.status === "EXECUTING" ? "Processing..." : null)
-  const isAiWorking = !!aiStatus || isTriggering || run?.status === "QUEUED" || run?.status === "EXECUTING"
+  const activeRunStatus = runId ? (run?.metadata?.status as string) : null
+  const aiStatus = sharedAiStatus || activeRunStatus || (runId && run?.status === "EXECUTING" ? "Processing..." : null)
+  const isAiWorking = !!aiStatus || isTriggering || (!!runId && (run?.status === "QUEUED" || run?.status === "EXECUTING"))
 
   return (
     <div className={cn("flex h-full flex-col overflow-hidden", className)}>
@@ -240,8 +243,10 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
           </TabsList>
         </div>
 
-        <TabsContent value="assistant" className="m-0 flex flex-1 flex-col overflow-hidden">
-          <ScrollArea ref={scrollRef} className="flex-1 px-4 py-4">
+        {/* min-h-0 is necessary for the flex child to shrink properly and allow inner scrolling */}
+        <TabsContent value="assistant" className="m-0 flex flex-1 flex-col overflow-hidden min-h-0">
+          {/* Use viewportRef instead of ref to attach scroll behavior directly to the scrollable viewport */}
+          <ScrollArea viewportRef={scrollRef} className="flex-1 min-h-0 px-4 py-4">
             <div className="space-y-6">
               {/* Welcome Message */}
               {messages.length === 0 && (
@@ -368,7 +373,8 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
           </div>
         </TabsContent>
 
-        <TabsContent value="specs" className="m-0 flex flex-1 flex-col overflow-hidden">
+        {/* Added min-h-0 so the spec content can properly scroll inside a flex layout */}
+        <TabsContent value="specs" className="m-0 flex flex-1 flex-col overflow-hidden min-h-0">
           <div className="flex items-center justify-between border-b border-border/50 px-4 py-2 shrink-0">
             <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
               Generated Specifications
@@ -384,7 +390,7 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
             </Button>
           </div>
 
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 min-h-0">
             <div className="p-4">
               {isLoadingSpecs ? (
                 <div className="flex h-32 flex-col items-center justify-center gap-2 text-muted-foreground">
