@@ -17,3 +17,14 @@ export const ChatMessageSchema = z.object({
 });
 
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+
+export interface DesignTaskOutput {
+  success: boolean
+  explanation: string
+  actionCount: number
+}
+
+export interface SpecTaskOutput {
+  specId: string
+  filePath: string
+}

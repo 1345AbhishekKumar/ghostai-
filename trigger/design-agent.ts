@@ -250,10 +250,10 @@ The output MUST:
 STRICT OUTPUT RULES
 ━━━━━━━━━━━━━━━━━━━━
 
-- Return ONLY a valid JSON array.
-- NEVER explain anything.
-- NEVER include markdown.
-- NEVER include prose.
+- Return a valid JSON object with "actions" and "explanation" fields.
+- The "explanation" should be a brief, professional summary of your design decisions.
+- NEVER include markdown in the explanation.
+- NEVER include prose outside the JSON object.
 - NEVER return comments.
 - NEVER return invalid JSON.
 
@@ -484,53 +484,44 @@ The renderer depends on:
 - updateNode
 
 ━━━━━━━━━━━━━━━━━━━━
-ACTION SCHEMAS
+ACTION SCHEMAS (FLAT)
 ━━━━━━━━━━━━━━━━━━━━
 
 addNode:
 {
   "type": "addNode",
-  "node": {
-    "id": "node-auth-1",
-    "shape": "pill",
-    "label": "Auth Service",
-    "position": {
-      "x": 0,
-      "y": 0
-    },
-    "style": {
-      "fill": "#HEX"
-    }
-  }
+  "id": "node-auth-1",
+  "shape": "pill",
+  "label": "Auth Service",
+  "x": 0,
+  "y": 0,
+  "color": "#HEX"
 }
 
 addEdge:
 {
   "type": "addEdge",
-  "edge": {
-    "id": "edge-1",
-    "source": "node-a",
-    "target": "node-b"
-  }
+  "id": "edge-1",
+  "source": "node-a",
+  "target": "node-b",
+  "label": "optional label"
 }
 
 updateNode:
 {
   "type": "updateNode",
-  "node": {
-    "id": "existing-node-id",
-    "position": {
-      "x": 100,
-      "y": 200
-    }
-  }
+  "id": "existing-node-id",
+  "label": "New Label",
+  "x": 100,
+  "y": 200,
+  "color": "#HEX"
 }
 
 ━━━━━━━━━━━━━━━━━━━━
 FINAL RULE
 ━━━━━━━━━━━━━━━━━━━━
 
-Return ONLY structured JSON actions for a beautiful, professional, readable architecture diagram.
+Return ONLY a structured JSON object containing "actions" and "explanation" for a beautiful, professional, readable architecture diagram.
       `,
       // prompt: `
       //   You are Ghost AI, a senior system architect and designer.

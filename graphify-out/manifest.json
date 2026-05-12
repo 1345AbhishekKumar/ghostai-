@@ -1,0 +1,518 @@
+{
+  "E:\\ghostai\\eslint.config.mjs": {
+    "mtime": 1777726809.6934414,
+    "hash": "dfa1f5f6a7037bf39dc510f30b180002"
+  },
+  "E:\\ghostai\\liveblocks.config.ts": {
+    "mtime": 1778395481.2987885,
+    "hash": "7867690f914d0c8136ae9ada5df34d20"
+  },
+  "E:\\ghostai\\next-env.d.ts": {
+    "mtime": 1778400411.8079352,
+    "hash": "d0f8375ae1199dc7acd3977fc33b78b8"
+  },
+  "E:\\ghostai\\next.config.js": {
+    "mtime": 1778396169.3955731,
+    "hash": "de63749571962ba7d5e7963f952c2bc2"
+  },
+  "E:\\ghostai\\postcss.config.mjs": {
+    "mtime": 1777726809.7782419,
+    "hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "E:\\ghostai\\prisma.config.ts": {
+    "mtime": 1777869743.0114193,
+    "hash": "db1a6a20f6b8e23600020d3768ffb3f4"
+  },
+  "E:\\ghostai\\proxy.ts": {
+    "mtime": 1777831319.4717455,
+    "hash": "870328f4f3b74deaa0e9dc60c26de839"
+  },
+  "E:\\ghostai\\test-storage.mjs": {
+    "mtime": 1778403978.2515905,
+    "hash": "37c882ea7ea4871149084682598e3dc0"
+  },
+  "E:\\ghostai\\trigger.config.ts": {
+    "mtime": 1778185876.3195093,
+    "hash": "d32478dbd802cce3867c5a70f3c796a3"
+  },
+  "E:\\ghostai\\app\\error.tsx": {
+    "mtime": 1778396231.3725753,
+    "hash": "be2dcae1004da50d547c8c572d57aa9d"
+  },
+  "E:\\ghostai\\app\\global-error.tsx": {
+    "mtime": 1778396262.0481753,
+    "hash": "1ad073eaafa03b0032e3d4cf8553bb59"
+  },
+  "E:\\ghostai\\app\\layout.tsx": {
+    "mtime": 1778396156.6876779,
+    "hash": "8739e3776914a297e7ba6e98e651813c"
+  },
+  "E:\\ghostai\\app\\not-found.tsx": {
+    "mtime": 1778396779.8213503,
+    "hash": "da25dd30ded8aaa836b1d113926d2e43"
+  },
+  "E:\\ghostai\\app\\page.tsx": {
+    "mtime": 1777831306.287837,
+    "hash": "e92b512f56ee0c84b4a617c0d947368c"
+  },
+  "E:\\ghostai\\app\\api\\ai\\design\\route.ts": {
+    "mtime": 1778187578.7508986,
+    "hash": "6a8d91c639bb5be35c8a6cd8a54cae0a"
+  },
+  "E:\\ghostai\\app\\api\\ai\\spec\\route.ts": {
+    "mtime": 1778188049.626037,
+    "hash": "24be31ee8e7ddd49711333a32ddc2a68"
+  },
+  "E:\\ghostai\\app\\api\\ai\\spec\\token\\route.ts": {
+    "mtime": 1778352818.887153,
+    "hash": "dc0405f143034623e64adef9c8997d96"
+  },
+  "E:\\ghostai\\app\\api\\liveblocks-auth\\route.ts": {
+    "mtime": 1778141786.0559509,
+    "hash": "c6179a09284069ef669566fe13cfffc0"
+  },
+  "E:\\ghostai\\app\\api\\projects\\route.ts": {
+    "mtime": 1777872263.5437255,
+    "hash": "88ad29585d37b9d4c4cdacc90c2337d3"
+  },
+  "E:\\ghostai\\app\\api\\projects\\[projectId]\\route.ts": {
+    "mtime": 1777871453.46627,
+    "hash": "2839d1bd13ba609da58d6b256d367745"
+  },
+  "E:\\ghostai\\app\\api\\projects\\[projectId]\\canvas\\route.ts": {
+    "mtime": 1778351862.1063254,
+    "hash": "1f10acf8933d4ddc19004b3bc7381059"
+  },
+  "E:\\ghostai\\app\\api\\projects\\[projectId]\\collaborators\\route.ts": {
+    "mtime": 1777881333.326759,
+    "hash": "bf35b748fe727e1a0fb4bd7e5653f072"
+  },
+  "E:\\ghostai\\app\\api\\projects\\[projectId]\\specs\\route.ts": {
+    "mtime": 1778399946.4047492,
+    "hash": "499db2d55a174e1a9fca72fb1703ca91"
+  },
+  "E:\\ghostai\\app\\api\\projects\\[projectId]\\specs\\[specId]\\download\\route.ts": {
+    "mtime": 1778352705.7288823,
+    "hash": "da1b42f761fee2395f846b1f1528585e"
+  },
+  "E:\\ghostai\\app\\editor\\page.tsx": {
+    "mtime": 1777872239.822739,
+    "hash": "6f1ad5b011a506f9315db9ad12323be6"
+  },
+  "E:\\ghostai\\app\\editor\\[roomId]\\page.tsx": {
+    "mtime": 1777893809.6515923,
+    "hash": "747f918ea64eedcc790cb2a3c2dfa519"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\browser.ts": {
+    "mtime": 1778353044.9435365,
+    "hash": "f6338456ab5eeb0b92cd611c111548ab"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\client.ts": {
+    "mtime": 1778353044.946538,
+    "hash": "4e5a1351f9060630307b7d8cbd5cf8b7"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\commonInputTypes.ts": {
+    "mtime": 1778353044.9445386,
+    "hash": "08c94551bde9be73e0d93958abefed7b"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\enums.ts": {
+    "mtime": 1778353044.9435365,
+    "hash": "ac31aff0c4969f7a338100dc53686824"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\models.ts": {
+    "mtime": 1778353044.9445386,
+    "hash": "37026a6261e161439ddf9b8970e8589f"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\internal\\class.ts": {
+    "mtime": 1778353045.1470747,
+    "hash": "84938e03a3f4b5d616a4a28d4e90a0da"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\internal\\prismaNamespace.ts": {
+    "mtime": 1778353045.1470747,
+    "hash": "7d81804895b1a19733001c207f144593"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\internal\\prismaNamespaceBrowser.ts": {
+    "mtime": 1778353045.1470747,
+    "hash": "f9e0af3fbf161968fddd07a9f7ac347a"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\models\\Project.ts": {
+    "mtime": 1778353044.961877,
+    "hash": "e00e8c38ff6488b1b23a3bd605ff5312"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\models\\ProjectCollaborator.ts": {
+    "mtime": 1778353044.961877,
+    "hash": "710e45ccd19542810b5270a5ff7d4337"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\models\\ProjectSpec.ts": {
+    "mtime": 1778353044.961877,
+    "hash": "e7b6b6de08d1704b0da16bb6e65a0804"
+  },
+  "E:\\ghostai\\app\\generated\\prisma\\models\\TaskRun.ts": {
+    "mtime": 1778353044.961877,
+    "hash": "2b7da142e77fbfa8b1c6639ec760701d"
+  },
+  "E:\\ghostai\\app\\sign-in\\[[...sign-in]]\\page.tsx": {
+    "mtime": 1777831311.1001825,
+    "hash": "5a415bc2cef7e14f9873b9408444b589"
+  },
+  "E:\\ghostai\\app\\sign-up\\[[...sign-up]]\\page.tsx": {
+    "mtime": 1777831315.2755432,
+    "hash": "4608da3c32ecde9b9b38e481c944642b"
+  },
+  "E:\\ghostai\\components\\auth\\auth-shell.tsx": {
+    "mtime": 1777831255.6642299,
+    "hash": "c21042ba3853a838df838e3d9404a982"
+  },
+  "E:\\ghostai\\components\\editor\\access-denied.tsx": {
+    "mtime": 1777895747.6836045,
+    "hash": "db09c2b4dacfd7c6575edf8bb3ef7c1a"
+  },
+  "E:\\ghostai\\components\\editor\\ai-sidebar.tsx": {
+    "mtime": 1778401423.4028444,
+    "hash": "8dbba7b41e6883893efb47124ba5522d"
+  },
+  "E:\\ghostai\\components\\editor\\canvas-basic-edge.tsx": {
+    "mtime": 1778084240.234768,
+    "hash": "519a89419522d9b5da8c9d866b74f8a9"
+  },
+  "E:\\ghostai\\components\\editor\\canvas-basic-node.tsx": {
+    "mtime": 1778142870.057963,
+    "hash": "be5ac37bd4a058b8c5d260af1f51a81b"
+  },
+  "E:\\ghostai\\components\\editor\\dialog-pattern.tsx": {
+    "mtime": 1777824438.9574258,
+    "hash": "ad63ddd8dba9e63e407486e4016ce87f"
+  },
+  "E:\\ghostai\\components\\editor\\editor-home-client.tsx": {
+    "mtime": 1777895705.3738446,
+    "hash": "eac1ce05f6f41b388c6ca5eb7b41a8bb"
+  },
+  "E:\\ghostai\\components\\editor\\editor-layout.tsx": {
+    "mtime": 1778091281.5651329,
+    "hash": "9945724e08d337d07ce8e0453adce046"
+  },
+  "E:\\ghostai\\components\\editor\\editor-navbar.tsx": {
+    "mtime": 1777979428.4220808,
+    "hash": "757543015f51bdd4edbc2b8329d1275c"
+  },
+  "E:\\ghostai\\components\\editor\\editor-workspace-client.tsx": {
+    "mtime": 1778396833.2540398,
+    "hash": "8672e02c70904ec9795b56b5c8813be9"
+  },
+  "E:\\ghostai\\components\\editor\\participant-avatars.tsx": {
+    "mtime": 1778396215.9930687,
+    "hash": "651831bba0cb68065b03323e87e06550"
+  },
+  "E:\\ghostai\\components\\editor\\project-dialogs.tsx": {
+    "mtime": 1777872254.454739,
+    "hash": "5255d57eecced823fbc0fc849aeb45cc"
+  },
+  "E:\\ghostai\\components\\editor\\project-sidebar.tsx": {
+    "mtime": 1778091235.6122653,
+    "hash": "b9954eb1d07e0e48ea32106b202042e1"
+  },
+  "E:\\ghostai\\components\\editor\\shape-panel.tsx": {
+    "mtime": 1777900889.7949207,
+    "hash": "575fcbc2b91d8ea099b4c2398207e119"
+  },
+  "E:\\ghostai\\components\\editor\\share-dialog.tsx": {
+    "mtime": 1777895755.5996954,
+    "hash": "43caa529c768100d9e8756c0e4c6c537"
+  },
+  "E:\\ghostai\\components\\editor\\spec-preview-modal.tsx": {
+    "mtime": 1778402310.3238778,
+    "hash": "c6bfd5ba56bbd27eb2d33e34299c6afa"
+  },
+  "E:\\ghostai\\components\\editor\\starter-templates-modal.tsx": {
+    "mtime": 1777981218.9773996,
+    "hash": "3566a110f3bfd5f0f3877a37430fd965"
+  },
+  "E:\\ghostai\\components\\editor\\starter-templates.ts": {
+    "mtime": 1777978431.3621294,
+    "hash": "15d2999758280bf782f97256dc61af5f"
+  },
+  "E:\\ghostai\\components\\editor\\use-project-dialogs.ts": {
+    "mtime": 1777872290.922202,
+    "hash": "640338d40d4163e054ce55d8057723f8"
+  },
+  "E:\\ghostai\\components\\editor\\workspace-canvas.tsx": {
+    "mtime": 1778408424.8610642,
+    "hash": "301b35cc09eae946a7c4be9d53179734"
+  },
+  "E:\\ghostai\\components\\ui\\button.tsx": {
+    "mtime": 1777822521.1336033,
+    "hash": "705bf3552a39e0c722665ccbecb30654"
+  },
+  "E:\\ghostai\\components\\ui\\card.tsx": {
+    "mtime": 1777823571.1697915,
+    "hash": "77a10bd948ca424972a28e704a3df604"
+  },
+  "E:\\ghostai\\components\\ui\\dialog.tsx": {
+    "mtime": 1777823573.3520503,
+    "hash": "d9618a63d34473ec512321cc12d43692"
+  },
+  "E:\\ghostai\\components\\ui\\input.tsx": {
+    "mtime": 1777823571.6157713,
+    "hash": "0607b02d99a2e92f9509223f36ccc6ec"
+  },
+  "E:\\ghostai\\components\\ui\\scroll-area.tsx": {
+    "mtime": 1778401792.1204677,
+    "hash": "9790e7936e3a0800761f0050be8230eb"
+  },
+  "E:\\ghostai\\components\\ui\\tabs.tsx": {
+    "mtime": 1777823572.0091434,
+    "hash": "429035bc858475cd3bcedbb08a5ba8da"
+  },
+  "E:\\ghostai\\components\\ui\\textarea.tsx": {
+    "mtime": 1777823572.4572823,
+    "hash": "d448d2a90e48542e51b93a1189127bf2"
+  },
+  "E:\\ghostai\\hooks\\use-canvas-autosave.ts": {
+    "mtime": 1778350824.7702844,
+    "hash": "858865f25a05455ffca600643cbe7abf"
+  },
+  "E:\\ghostai\\hooks\\use-keyboard-shortcuts.ts": {
+    "mtime": 1778407585.6500669,
+    "hash": "0a6f4725ca6fc39f02d4f5d2512ab582"
+  },
+  "E:\\ghostai\\hooks\\use-project-actions.ts": {
+    "mtime": 1777872267.1419988,
+    "hash": "beaedbeb3e873976dbce02054b770366"
+  },
+  "E:\\ghostai\\lib\\clerk-routes.ts": {
+    "mtime": 1777831303.4805186,
+    "hash": "5b0721f1455936f80219fa65cffbfbd5"
+  },
+  "E:\\ghostai\\lib\\liveblocks.ts": {
+    "mtime": 1777882778.05209,
+    "hash": "a52f964a13967413c6476a78c342fce8"
+  },
+  "E:\\ghostai\\lib\\prisma.ts": {
+    "mtime": 1778141759.6703563,
+    "hash": "0dd37a44922aca6e7bd0f54700a30909"
+  },
+  "E:\\ghostai\\lib\\project-access.ts": {
+    "mtime": 1777876371.641623,
+    "hash": "2d90aefbaa0870d8cc514b4a9e98c323"
+  },
+  "E:\\ghostai\\lib\\project-data.ts": {
+    "mtime": 1777872207.1477067,
+    "hash": "4abbd12e3fc3a1c63ae7086850560882"
+  },
+  "E:\\ghostai\\lib\\utils.ts": {
+    "mtime": 1777822521.5808077,
+    "hash": "5a6fd53fdcf2be529e9cc0b718fde352"
+  },
+  "E:\\ghostai\\prisma\\migrations\\20260504044419_add_project_models\\migration.sql": {
+    "mtime": 1777869859.0803518,
+    "hash": "ef69d2f7dea231b1c52d38d348fcf608"
+  },
+  "E:\\ghostai\\prisma\\migrations\\20260507090702_add_task_run\\migration.sql": {
+    "mtime": 1778144822.8520281,
+    "hash": "68a539e1e906e49dec5f5cc018f08cfd"
+  },
+  "E:\\ghostai\\prisma\\migrations\\20260507211606_add_project_spec\\migration.sql": {
+    "mtime": 1778188566.413487,
+    "hash": "2979f6c66b1eaf042cb2a1716d7f2f66"
+  },
+  "E:\\ghostai\\src\\trigger\\example.ts": {
+    "mtime": 1778140883.4323604,
+    "hash": "1180e7269355da2d4f17c3b615d42307"
+  },
+  "E:\\ghostai\\trigger\\design-agent.ts": {
+    "mtime": 1778406162.9138496,
+    "hash": "619872ffcd23511a5a0735a68cd11099"
+  },
+  "E:\\ghostai\\trigger\\example.ts": {
+    "mtime": 1778139266.0235825,
+    "hash": "5042a99ea52bbbea399bdde11fa876a9"
+  },
+  "E:\\ghostai\\trigger\\generate-spec.ts": {
+    "mtime": 1778570759.0097566,
+    "hash": "998712f4a78f612b30558f5a5353f279"
+  },
+  "E:\\ghostai\\types\\canvas.ts": {
+    "mtime": 1777976735.8927593,
+    "hash": "5b9a69cb995f2eef0976362c0258d843"
+  },
+  "E:\\ghostai\\types\\editor-project.ts": {
+    "mtime": 1777872198.754162,
+    "hash": "666f4b5f796662bbe9a48dc0fcc82115"
+  },
+  "E:\\ghostai\\types\\tasks.ts": {
+    "mtime": 1778186864.4768157,
+    "hash": "8d1fc97c1e94aa1ec8a5e15bff9448e4"
+  },
+  "E:\\ghostai\\AGENTS.md": {
+    "mtime": 1778139502.8303714,
+    "hash": "46ebcae0bcb71f5b1b2a1eb462f00e27"
+  },
+  "E:\\ghostai\\GEMINI.md": {
+    "mtime": 1778572725.262748,
+    "hash": "fd57c36416e22c89e0b7b7b4a4be479f"
+  },
+  "E:\\ghostai\\README.md": {
+    "mtime": 1777836390.1263223,
+    "hash": "cf1a155ce193ce03cb3d63585236dc2d"
+  },
+  "E:\\ghostai\\context\\ai-workflow-rules.md": {
+    "mtime": 1777746084.8167367,
+    "hash": "2560d31b7afbc4ce3bf7bbd0f218a2fe"
+  },
+  "E:\\ghostai\\context\\architecture-context.md": {
+    "mtime": 1777746084.8320875,
+    "hash": "044c5e2b9e7c2ba661f0cfcd468e381c"
+  },
+  "E:\\ghostai\\context\\code-standards.md": {
+    "mtime": 1777746084.8461945,
+    "hash": "50a26c215f780210f13e5d6d39ca2f52"
+  },
+  "E:\\ghostai\\context\\current-issues.md": {
+    "mtime": 1778571112.753508,
+    "hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "E:\\ghostai\\context\\progress-tracker.md": {
+    "mtime": 1778353582.3103356,
+    "hash": "000d05d737171af3f1d580b1788d6e95"
+  },
+  "E:\\ghostai\\context\\project-overview.md": {
+    "mtime": 1777746084.8753633,
+    "hash": "e9d6af32a0fe2d89a9f99d1ed470f071"
+  },
+  "E:\\ghostai\\context\\report.md": {
+    "mtime": 1778408673.8010106,
+    "hash": "f2c57e4dfb1a615b173cc18aa5b22c7e"
+  },
+  "E:\\ghostai\\context\\ui-context.md": {
+    "mtime": 1777746084.8949616,
+    "hash": "42c7b6b37d4cba78189c9af6cbbec57f"
+  },
+  "E:\\ghostai\\context\\feature-specs\\01-design-system.md": {
+    "mtime": 1777746084.9170835,
+    "hash": "da600ae0cb51a7f15b3685303fd4f65d"
+  },
+  "E:\\ghostai\\context\\feature-specs\\02-editor.md": {
+    "mtime": 1777824143.7159226,
+    "hash": "c65390e25b48f5fb5eb44ab66cd122a5"
+  },
+  "E:\\ghostai\\context\\feature-specs\\03-auth.md": {
+    "mtime": 1777830984.4923427,
+    "hash": "4b520d2e352513dbbfbe40b1839d7b79"
+  },
+  "E:\\ghostai\\context\\feature-specs\\04-project-dialogs.md": {
+    "mtime": 1777833630.4016242,
+    "hash": "1bbac8d8001a0bae376590561692d392"
+  },
+  "E:\\ghostai\\context\\feature-specs\\05-prisma.md": {
+    "mtime": 1777835816.1067533,
+    "hash": "5417d4ddaf98a699939fd9ac9cad34e5"
+  },
+  "E:\\ghostai\\context\\feature-specs\\06-project-apis.md": {
+    "mtime": 1777870937.6092744,
+    "hash": "dbee860d224b7157231e55d91bb1f636"
+  },
+  "E:\\ghostai\\context\\feature-specs\\07-wire-editor-home.md": {
+    "mtime": 1777871271.8262641,
+    "hash": "e3f5da1c9776ebaf8f1e7b7745fd0abd"
+  },
+  "E:\\ghostai\\context\\feature-specs\\08-editor-workspace-shell.md": {
+    "mtime": 1777875555.620388,
+    "hash": "e4bcb1b26889688cf675615c084f2ea1"
+  },
+  "E:\\ghostai\\context\\feature-specs\\09-share-dialog.md": {
+    "mtime": 1777879310.2512567,
+    "hash": "b0a7fad563080bb834ceb5370d4d025a"
+  },
+  "E:\\ghostai\\context\\feature-specs\\10-liveblock-setup.md": {
+    "mtime": 1777882214.9483569,
+    "hash": "32bafb0ccf62d50a2f64889ca884be38"
+  },
+  "E:\\ghostai\\context\\feature-specs\\11-base-canvas.md": {
+    "mtime": 1777894859.251315,
+    "hash": "1ad7efad0555f9d003b9a3736e7c58e1"
+  },
+  "E:\\ghostai\\context\\feature-specs\\12-shape-panel.md": {
+    "mtime": 1777894697.8802013,
+    "hash": "c6c25f87e72597fb8dd609221e11caaf"
+  },
+  "E:\\ghostai\\context\\feature-specs\\13-node-shape.md": {
+    "mtime": 1777900253.1532845,
+    "hash": "16ffdfb84b68c1f3507f7223aa007bc9"
+  },
+  "E:\\ghostai\\context\\feature-specs\\14-node-editing.md": {
+    "mtime": 1777901452.931221,
+    "hash": "c867d1418a54d3034885dd5b7cf7c0d0"
+  },
+  "E:\\ghostai\\context\\feature-specs\\15-node-color-toolbar.md": {
+    "mtime": 1777968008.1331463,
+    "hash": "3f264793eb686a6dd19cd57a30bf9971"
+  },
+  "E:\\ghostai\\context\\feature-specs\\16-edge-behaviour.md": {
+    "mtime": 1777968032.0021398,
+    "hash": "d7b7d27c049c11d0cb1eba3c994c7d26"
+  },
+  "E:\\ghostai\\context\\feature-specs\\17-starter-template.md": {
+    "mtime": 1777977251.4601424,
+    "hash": "ecb575506869316784a9bc4b0926eb67"
+  },
+  "E:\\ghostai\\context\\feature-specs\\18-present-avatars-cursor.md": {
+    "mtime": 1777980860.7570422,
+    "hash": "f44b414844af6183fe08d93c03e1e3ff"
+  },
+  "E:\\ghostai\\context\\feature-specs\\19-canvas-egonomics.md": {
+    "mtime": 1778084244.917235,
+    "hash": "36b496304609f65e79b12bd1b4768a3f"
+  },
+  "E:\\ghostai\\context\\feature-specs\\20-ai-sidebar-shell.md": {
+    "mtime": 1778088041.1843295,
+    "hash": "acfb55e1d4080744ce3daeb0ef71679b"
+  },
+  "E:\\ghostai\\context\\feature-specs\\21-canvas-autosave.md": {
+    "mtime": 1778128451.2914565,
+    "hash": "3e5f30db74d048bdbc806eabc1de01ef"
+  },
+  "E:\\ghostai\\context\\feature-specs\\22-design-agent-api.md": {
+    "mtime": 1778144621.016471,
+    "hash": "84d8d8e59b0b2de6fe30cd84670ff333"
+  },
+  "E:\\ghostai\\context\\feature-specs\\23-design-agent-logic.md": {
+    "mtime": 1778144642.7424202,
+    "hash": "e8d9e700d3e58f29e8a75e205306585f"
+  },
+  "E:\\ghostai\\context\\feature-specs\\24-ai-presence-state.md": {
+    "mtime": 1778186065.2499065,
+    "hash": "39c8ab9b876f0644a60e6333f2a13edd"
+  },
+  "E:\\ghostai\\context\\feature-specs\\25-sidebar-chat-feed.md": {
+    "mtime": 1778186221.2622597,
+    "hash": "5abe3ee92d08fa7dbae2bbbd7ca715e1"
+  },
+  "E:\\ghostai\\context\\feature-specs\\26-design-agent-fronted.md": {
+    "mtime": 1778186885.0125957,
+    "hash": "541a6327db3402f567bfb9360f2b043e"
+  },
+  "E:\\ghostai\\context\\feature-specs\\27-spec-generation-flow.md": {
+    "mtime": 1778187578.214157,
+    "hash": "4211b49c93a87fef407a9dd4436e9cf0"
+  },
+  "E:\\ghostai\\context\\feature-specs\\28-spec-downloaded.md": {
+    "mtime": 1778187614.1100886,
+    "hash": "34289f63f9cbbe8f8b524e9228367172"
+  },
+  "E:\\ghostai\\context\\feature-specs\\29-spec-ui-intergration.md": {
+    "mtime": 1778187648.048199,
+    "hash": "d8d38bc5e31cce47a7b133f67c9b6939"
+  },
+  "E:\\ghostai\\context\\screenshot\\hhhd.png": {
+    "mtime": 1778344784.8094692,
+    "hash": "9406ca4dcb544fe2da8059519486ec4c"
+  },
+  "E:\\ghostai\\context\\screenshot\\sfdd.png": {
+    "mtime": 1778088689.480168,
+    "hash": "be7d9cd770be3e4667dee079b845b192"
+  },
+  "E:\\ghostai\\context\\screenshot\\ss.png": {
+    "mtime": 1777898443.2219822,
+    "hash": "b4f873c7995f77f48003743126e65f2b"
+  }
+}

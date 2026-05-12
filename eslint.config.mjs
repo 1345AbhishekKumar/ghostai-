@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Internal/copilot skill assets are not part of the app source tree.
+    ".agents/**",
+    "graphify-out/**",
   ]),
 ]);
 

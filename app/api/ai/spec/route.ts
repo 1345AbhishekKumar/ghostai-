@@ -20,7 +20,12 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  let body: any
+  let body: {
+    roomId: string;
+    chatHistory: any[];
+    nodes: any[];
+    edges: any[];
+  }
   try {
     body = await request.json()
   } catch {

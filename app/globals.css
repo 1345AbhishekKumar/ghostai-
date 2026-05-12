@@ -1,12 +1,18 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "@clerk/ui/themes/shadcn.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: var(--font-sans);
+    --color-brand-black: #0a0a0a;
+    --color-brand-dark: #121212;
+    --color-brand-surface: #1A1A1A;
+    --color-brand-accent: #FFB800;
+    --color-brand-accent-dark: #F58500;
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -119,11 +125,72 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+  }
   html {
     @apply font-sans;
-    }
+  }
+}
+
+@layer components {
+  .glass-input {
+    @apply bg-white/5 border border-white/10 backdrop-blur-md transition-all duration-300;
+  }
+
+  .glass-input:focus-within {
+    @apply bg-white/10 border-brand-accent transform -translate-y-px;
+    box-shadow: 0 0 0 1px var(--color-brand-accent), 0 8px 24px -8px rgba(255, 184, 0, 0.2);
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #1A1A1A inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  .cta-button {
+    background: linear-gradient(135deg, var(--color-brand-accent) 0%, var(--color-brand-accent-dark) 100%);
+    box-shadow: 0 8px 32px -8px rgba(255, 138, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    color: #ffffff;
+  }
+  
+  .cta-button::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: skewX(-20deg);
+    transition: 0.5s;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .cta-button:hover::after {
+    left: 150%;
+  }
+
+  .cta-button:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 40px -8px rgba(255, 138, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  }
+
+  .cta-button:active {
+    transform: translateY(1px) scale(0.98);
+  }
+
+  .social-btn {
+    @apply bg-white/5 border border-white/10 transition-all duration-300;
+  }
+  
+  .social-btn:hover {
+    @apply bg-white/10 border-white/20 transform -translate-y-0.5;
+  }
 }

@@ -1,10 +1,2 @@
-
-here is the problem :
-        The AI is replacing the current architecture diagram instead of adding a new one separately.
-
-What is happening:
-
-You created the first architecture → it displayed correctly
-Then you asked AI to create another architecture
-Instead of creating a new diagram/version, the AI overwrote the existing canvas
-So the previous architecture disappeared
+here is the problem: 
+        when i generate the specs , it's show successfully generated in the terminal and also show in the specs in the sidebar but the problem is htat when i generate specs , it does not show the specs when reload the complete page then it's show the Generated Specifications. 

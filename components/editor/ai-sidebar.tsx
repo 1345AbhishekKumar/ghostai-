@@ -4,7 +4,7 @@ import { FileText, Send, Sparkles, MessageSquare, Loader2, User, Download, Exter
 import Image from "next/image"
 import { useState, useMemo, useRef, useEffect } from "react"
 import { useRealtimeRun } from "@trigger.dev/react-hooks"
-import { useStorage, useMutation, useSelf } from "@liveblocks/react/suspense"
+import { useStorage, useMutation } from "@liveblocks/react/suspense"
 import { LiveObject } from "@liveblocks/client"
 import { useUser } from "@clerk/nextjs"
 import { useReactFlow } from "@xyflow/react"
@@ -14,16 +14,12 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
-import { AiStatusSchema, ChatMessageSchema, type ChatMessage } from "@/types/tasks"
+import { AiStatusSchema, ChatMessageSchema, type ChatMessage, type DesignTaskOutput } from "@/types/tasks"
 import { SpecPreviewModal } from "@/components/editor/spec-preview-modal"
 
-interface ProjectSpec {
-  id: string
-  projectId: string
-  createdAt: string
-  filename: string
-  filePath: string
-}
+import { type ProjectSpec } from "@/store/spec-store"
+import { useSpecStore } from "@/store/spec-store-provider"
+import { useShallow } from "zustand/react/shallow"
 
 interface AiSidebarProps {
   className?: string
@@ -38,16 +34,66 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
   const [isTriggering, setIsTriggering] = useState(false)
   const [runId, setRunId] = useState<string | null>(null)
   const [token, setToken] = useState<string | null>(null)
+  const [activeRunType, setActiveRunType] = useState<"design" | "spec" | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Specs state
-  const [specs, setSpecs] = useState<ProjectSpec[]>([])
-  const [isLoadingSpecs, setIsLoadingSpecs] = useState(false)
+  // Specs state from Zustand
+  const { specs, isLoadingSpecs, fetchSpecs } = useSpecStore(
+    useShallow((state) => ({
+      specs: state.specs,
+      isLoadingSpecs: state.isLoading,
+      fetchSpecs: state.fetchSpecs,
+    }))
+  )
+  
   const [isGeneratingSpec, setIsGeneratingSpec] = useState(false)
   const [selectedSpec, setSelectedSpec] = useState<ProjectSpec | null>(null)
 
   const aiStatusFeed = useStorage((root) => root["ai-status-feed"])
   const aiChat = useStorage((root) => root["ai-chat"])
+  const addMessage = useMutation(({ storage }, message: ChatMessage) => {
+    const sharedChat = storage.get("ai-chat")
+    sharedChat.push(new LiveObject(message))
+  }, [])
+
+  const sharedAiStatus = useMemo(() => {
+    const result = AiStatusSchema.safeParse(aiStatusFeed)
+    if (!result.success) return null
+    const statusText = result.data.text?.trim()
+    return statusText && statusText.length > 0 ? statusText : null
+  }, [aiStatusFeed])
+
+  const { run } = useRealtimeRun(runId || "", {
+    accessToken: token || "",
+    enabled: !!runId && !!token,
+    onComplete: (completedRun) => {
+      // Final fallback fetch
+      fetchSpecs(projectId)
+
+      if (completedRun.output) {
+        // Check if it was a design task or spec task
+        const designOutput = completedRun.output as DesignTaskOutput
+
+        if (designOutput.explanation) {
+          addMessage({
+            id: `ai-${runId}-${Date.now()}`,
+            senderId: "ghost-ai",
+            senderName: "Ghost AI",
+            senderAvatar: "",
+            content: designOutput.explanation,
+            role: "assistant",
+            timestamp: Date.now(),
+          })
+        }
+      }
+      
+      // Reset local run state
+      setRunId(null)
+      setToken(null)
+      setIsTriggering(false)
+      setActiveRunType(null)
+    },
+  })
   
   const messages = useMemo(() => {
     if (!aiChat) return []
@@ -59,74 +105,17 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
 
   // Fetch specs on mount and when projectId changes
   useEffect(() => {
-    fetchSpecs()
-  }, [projectId])
+    fetchSpecs(projectId)
+  }, [projectId, fetchSpecs])
 
-  const fetchSpecs = async () => {
-    setIsLoadingSpecs(true)
-    try {
-      const response = await fetch(`/api/projects/${projectId}/specs?_t=${Date.now()}`, {
-        cache: "no-store"
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setSpecs(data)
-      }
-    } catch (error) {
-      console.error("Failed to fetch specs:", error)
-    } finally {
-      setIsLoadingSpecs(false)
-    }
-  }
-
-  // Scroll to bottom when messages change
+  // Proactively fetch specs when the run metadata indicates success, 
+  // without waiting for the official COMPLETED status which can lag.
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    const runMetadataStatus = run?.metadata?.status as string | undefined
+    if (activeRunType === "spec" && runMetadataStatus === "Spec generated and saved!") {
+      fetchSpecs(projectId)
     }
-  }, [messages])
-
-  const addMessage = useMutation(({ storage }, message: ChatMessage) => {
-    const chat = storage.get("ai-chat")
-    chat.push(new LiveObject(message))
-  }, [])
-
-  const sharedAiStatus = useMemo(() => {
-    if (!aiStatusFeed) return null
-    const result = AiStatusSchema.safeParse(aiStatusFeed)
-    return result.success ? result.data.text : null
-  }, [aiStatusFeed])
-
-  const { run } = useRealtimeRun(runId || "", {
-    accessToken: token || "",
-    enabled: !!runId && !!token,
-  })
-
-  // Push final AI message when run completes
-  useEffect(() => {
-    if (run?.status === "COMPLETED" && run.output && runId) {
-      // Check if it was a design task or spec task
-      if ((run.output as any).explanation) {
-        const explanation = (run.output as any).explanation
-        addMessage({
-          id: `ai-${runId}-${Date.now()}`,
-          senderId: "ghost-ai",
-          senderName: "Ghost AI",
-          senderAvatar: "",
-          content: explanation,
-          role: "assistant",
-          timestamp: Date.now(),
-        })
-      } else if ((run.output as any).specId) {
-        // It was a spec generation task
-        fetchSpecs()
-      }
-      
-      // Reset local run state so we don't post again and to clear the loading state
-      setRunId(null)
-      setToken(null)
-    }
-  }, [run?.status, run?.output, runId, addMessage])
+  }, [run?.metadata?.status, activeRunType, projectId, fetchSpecs])
 
   const handleSend = async () => {
     if (!prompt.trim() || isTriggering || !user) return
@@ -149,6 +138,7 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
     setIsTriggering(true)
     setRunId(null)
     setToken(null)
+    setActiveRunType("design")
 
     try {
       // 2. Trigger the task and get token in one call
@@ -168,6 +158,7 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
       setToken(publicToken)
     } catch (error) {
       console.error("AI Trigger Error:", error)
+      setActiveRunType(null)
       // Push error message to chat
       addMessage({
         id: `err-${Date.now()}`,
@@ -186,6 +177,7 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
     if (isGeneratingSpec || isAiWorking) return
 
     setIsGeneratingSpec(true)
+    setActiveRunType("spec")
     try {
       const response = await fetch("/api/ai/spec", {
         method: "POST",
@@ -215,9 +207,12 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
         const { publicToken } = await tokenResponse.json()
         setRunId(newRunId)
         setToken(publicToken)
+      } else {
+        setActiveRunType(null)
       }
     } catch (error) {
       console.error("Spec Generation Error:", error)
+      setActiveRunType(null)
     } finally {
       setIsGeneratingSpec(false)
     }
@@ -236,7 +231,11 @@ export function AiSidebar({ className, roomId, projectId }: AiSidebarProps) {
               <MessageSquare className="size-3.5" />
               Assistant
             </TabsTrigger>
-            <TabsTrigger value="specs" className="gap-2 px-0 text-xs">
+            <TabsTrigger 
+              value="specs" 
+              className="gap-2 px-0 text-xs"
+              onClick={() => fetchSpecs(projectId)}
+            >
               <FileText className="size-3.5" />
               Specs
             </TabsTrigger>

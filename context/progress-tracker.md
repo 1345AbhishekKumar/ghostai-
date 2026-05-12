@@ -65,10 +65,23 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Session Notes
 
+- Build/Lint Maintenance (2026-05-12): Updated `eslint.config.mjs` to ignore non-app workspace folders (`.agents/**`, `graphify-out/**`) so `bun run lint` only targets project source files and avoids rule-runtime crashes from template assets.
+
+- Bug Fix Session (2026-05-12): Fixed runtime crash in `components/editor/ai-sidebar.tsx`.
+  - Root cause: `sharedAiStatus` and `addMessage` were referenced but not defined after sidebar refactoring.
+  - Fix: restored shared status parsing from Liveblocks `ai-status-feed` using `AiStatusSchema`, and restored collaborative chat write mutation via `useMutation` + `LiveObject` push to `ai-chat`.
+
+- Bug Fix Session (2026-05-12): Fixed delayed spec list refresh in `AiSidebar`.
+  - Root cause: spec list refresh in realtime `onComplete` depended on `completedRun.output` being present. Some completed runs reached the UI without output payload, so specs were only visible after page reload.
+  - Fix: introduced explicit run-type tracking (`design` vs `spec`) and always refresh specs on spec-run completion, independent of output payload shape.
+  - Reset run-type state on completion/error paths to keep assistant/spec run handling isolated.
+
 - Bug Fix Session (2026-05-09): Fixed 4 runtime issues from `context/current-issues.md`.
   - **Problem 1 & 2 (Critical):** `INVALID_STORAGE_MUTATION_REQUEST: Invalid index: edge-gateway-to-cache` — Root cause: `useLiveblocksFlow` expects both `nodes` and `edges` as `LiveMap<string, ...>`. The `RoomProvider` was initializing `nodes` as `LiveObject({})` and `edges` as `LiveList([])`. Changed both to `LiveMap([])` in `editor-workspace-client.tsx`. Updated `design-agent.ts` to read edges as an object map (not array) and use map-style delete/update patterns.
   - **Problem 3 (DarkReader):** Hydration mismatch caused by the DarkReader browser extension injecting `style` attributes into SVG icons. Not fixable in application code — this is a browser extension side-effect acknowledged in the React error message.
   - **Problem 4 (Autosave 404):** Two causes: (a) autosave fired after project deletion — fixed by silently returning `idle` on 404; (b) specs route was returning 403 using `NextResponse` + old `checkProjectAccess` pattern — rewrote specs route to use `auth()` directly, return proper `404` for missing projects and `403` for forbidden access, consistent with other routes.
+
+- Redesigned the Custom Authentication UI (`components/auth/custom-auth-ui.tsx`) using Clerk. Fixed the Smart CAPTCHA console warning by adding the required `<div id="clerk-captcha"></div>` to ensure the bot protection widget has a rendering target.
 
 - Completed Feature Spec 29 (Spec UI Integration).
 - Created `GET /api/projects/[projectId]/specs` to list project specifications with synthesized filenames.

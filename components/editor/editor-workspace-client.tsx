@@ -179,33 +179,37 @@ function EditorWorkspaceClientInner({
   )
 }
 
+import { SpecStoreProvider } from "@/store/spec-store-provider"
+
 export function EditorWorkspaceClient(props: EditorWorkspaceClientProps) {
   return (
     <ReactFlowProvider>
-      <LiveblocksProvider authEndpoint="/api/liveblocks-auth">
-        <RoomProvider
-          id={props.roomId}
-          initialPresence={{
-            cursor: null,
-            thinking: false,
-          }}
-          initialStorage={{
-            // "flow" must be present to satisfy the Storage type.
-            // If the room already has a "flow" entry in Liveblocks cloud,
-            // this initial value is ignored and the persisted data takes over.
-            flow: new LiveObject({
-              nodes: new LiveMap(),
-              edges: new LiveMap(),
-            }),
-            "ai-status-feed": new LiveObject({}),
-            "ai-chat": new LiveList([]),
-          }}
-        >
-          <ClientSideSuspense fallback={<CanvasLoadingState />}>
-            {() => <EditorWorkspaceClientInner {...props} />}
-          </ClientSideSuspense>
-        </RoomProvider>
-      </LiveblocksProvider>
+      <SpecStoreProvider projectId={props.project.id}>
+        <LiveblocksProvider authEndpoint="/api/liveblocks-auth">
+          <RoomProvider
+            id={props.roomId}
+            initialPresence={{
+              cursor: null,
+              thinking: false,
+            }}
+            initialStorage={{
+              // "flow" must be present to satisfy the Storage type.
+              // If the room already has a "flow" entry in Liveblocks cloud,
+              // this initial value is ignored and the persisted data takes over.
+              flow: new LiveObject({
+                nodes: new LiveMap(),
+                edges: new LiveMap(),
+              }),
+              "ai-status-feed": new LiveObject({}),
+              "ai-chat": new LiveList([]),
+            }}
+          >
+            <ClientSideSuspense fallback={<CanvasLoadingState />}>
+              {() => <EditorWorkspaceClientInner {...props} />}
+            </ClientSideSuspense>
+          </RoomProvider>
+        </LiveblocksProvider>
+      </SpecStoreProvider>
     </ReactFlowProvider>
   )
 }
