@@ -65,6 +65,10 @@ Update this file whenever the current phase, active feature , or implementation 
 
 ## Session Notes
 
+- Bug Fix Session (2026-05-12): Fixed spec preview/download 404s in `GET /api/projects/[projectId]/specs/[specId]/download`.
+  - Root cause: the route required both `projectId` + `specId` to match, so stale/mismatched project IDs in URL paths caused false `404` responses even when the spec existed.
+  - Fix: resolve by `specId` first, then authorize access against `spec.projectId` and stream the file from Blob.
+
 - Build/Lint Maintenance (2026-05-12): Updated `eslint.config.mjs` to ignore non-app workspace folders (`.agents/**`, `graphify-out/**`) so `bun run lint` only targets project source files and avoids rule-runtime crashes from template assets.
 
 - Bug Fix Session (2026-05-12): Fixed runtime crash in `components/editor/ai-sidebar.tsx`.

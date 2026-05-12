@@ -13,17 +13,14 @@ export async function GET(_request: Request, context: DownloadRouteContext) {
   try {
     const { projectId, specId } = await context.params;
 
-    // 1. Verify project access
-    const project = await checkProjectAccess(projectId);
-    if (!project) {
-      return NextResponse.json({ error: "Forbidden or Not Found" }, { status: 403 });
-    }
-
-    // 2. Verify the spec belongs to the project
-    const spec = await prisma.projectSpec.findFirst({
-      where: {
-        id: specId,
-        projectId: projectId,
+    // Resolve by spec ID first. This prevents false 404s when a stale/mismatched
+    // projectId appears in the URL while still enforcing access on the actual owner project.
+    const spec = await prisma.projectSpec.findUnique({
+      where: { id: specId },
+      select: {
+        id: true,
+        projectId: true,
+        filePath: true,
       },
     });
 
@@ -31,14 +28,23 @@ export async function GET(_request: Request, context: DownloadRouteContext) {
       return NextResponse.json({ error: "Spec not found" }, { status: 404 });
     }
 
+    // Verify access against the project that owns this spec.
+    const project = await checkProjectAccess(spec.projectId);
+    if (!project) {
+      return NextResponse.json({ error: "Forbidden or Not Found" }, { status: 403 });
+    }
+
     // 3. Fetch the blob content from Vercel Blob storage using the stored URL.
     //    Private blobs are fetched server-side using the BLOB_READ_WRITE_TOKEN
     //    set in the environment. Passing the token as a Bearer header gives access.
-    const blobResponse = await fetch(spec.filePath, {
-      headers: {
-        Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
-      },
-    });
+    const readWriteToken = process.env.BLOB_READ_WRITE_TOKEN;
+    const blobResponse = await fetch(spec.filePath, readWriteToken
+      ? {
+          headers: {
+            Authorization: `Bearer ${readWriteToken}`,
+          },
+        }
+      : undefined);
 
     if (!blobResponse.ok) {
       console.error("Blob fetch failed:", blobResponse.status, blobResponse.statusText);
@@ -52,7 +58,7 @@ export async function GET(_request: Request, context: DownloadRouteContext) {
     return new Response(blobResponse.body, {
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",
-        "Content-Disposition": `attachment; filename="spec-${projectId}-${specId}.md"`,
+        "Content-Disposition": `attachment; filename="spec-${spec.projectId}-${specId}.md"`,
         "Cache-Control": "private, no-cache",
       },
     });
